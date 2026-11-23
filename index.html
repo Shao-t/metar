@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>機場天氣場景</title>
+<style>
+:root{--bg:#0f1826;--card:#16233a;--line:#26385a;--tx:#e9eff9;--mute:#8da0bf}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.55 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;padding:16px 18px 4px}
+h1{font-size:19px;font-weight:600;margin:0}
+.bar{display:flex;gap:12px;align-items:center;color:var(--mute);font-size:13px}
+.bar.old #st{color:#ffb454}
+select{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:inherit}
+#msg{display:none;margin:8px 18px 0;padding:8px 12px;border-radius:6px;background:#3b2c12;color:#ffd596;font-size:13px}
+main{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px;padding:14px 18px 30px}
+.card{background:var(--card);border-radius:10px;overflow:hidden}
+.sc{position:relative}
+canvas{display:block;width:100%;height:240px}
+.tag{position:absolute;top:10px;left:14px;font-size:17px;font-weight:600;text-shadow:0 1px 5px #0008}
+.tag small{display:block;font-size:12px;font-weight:400;opacity:.85}
+.cat{position:absolute;top:12px;right:14px;padding:1px 10px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
+.bd{position:absolute;left:14px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
+.bd span{background:#000a;border-radius:5px;padding:0 8px;font-size:12px}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:14px}
+.info b{display:block;color:var(--mute);font-weight:400;font-size:12px}
+.f{grid-column:1/-1}
+.raw{color:var(--mute);font-size:11px;word-break:break-all;border-top:1px solid var(--line);padding-top:8px}
+.ar{display:inline-block;margin-right:4px;color:#7cc4ff}
+@media(prefers-reduced-motion:reduce){canvas{opacity:.95}}
+</style>
+</head>
+<body>
+<header>
+  <h1>機場天氣場景</h1>
+  <div class="bar" id="bar"><span id="st">載入中…</span>
+    <select id="mode" aria-label="預覽情境"></select></div>
+</header>
+<div id="msg"></div>
+<main id="main"></main>
+<script>
+const API = '貼上你的 GAS /exec 網址';
+const META = {
+  TSA: ['RCSS', '松山', 25.0697, 121.5522],
+  SHA: ['ZSSS', '上海虹橋', 31.1979, 121.3363],
+  PVG: ['ZSPD', '上海浦東', 31.1443, 121.8083]
+};
+const CATC = { VFR: '#2e9e5b', MVFR: '#2f6fd6', IFR: '#d9382f', LIFR: '#b0309b' };
+const COV = { FEW: .2, SCT: .45, BKN: .75, OVC: 1, OVX: 1, VV: 1 };
+const PRE = {
+  sunny: ['晴朗大太陽', { raw: '（示範）18008KT CAVOK 35/22 Q1008', temp: 35, dewp: 22, altim: 1008, wdir: 180, wspd: 8, visib: '6+', clouds: [], wxString: '', fltCat: 'VFR', elev: 60 }],
+  storm: ['雷雨陣風', { raw: '（示範）27018G32KT 3000 +TSRA SCT008 BKN015CB 24/23 Q1005', temp: 24, dewp: 23, altim: 1005, wdir: 270, wspd: 18, wgst: 32, visib: 1.9, clouds: [{ cover: 'SCT', base: 800 }, { cover: 'BKN', base: 1500 }], wxString: '+TSRA', fltCat: 'IFR', elev: 25 }],
+  typhoon: ['強風豪雨', { raw: '（示範）04035G52KT 1600 +RA BKN006 OVC015 25/24 Q0975', temp: 25, dewp: 24, altim: 975, wdir: 40, wspd: 35, wgst: 52, visib: 1, clouds: [{ cover: 'BKN', base: 600 }, { cover: 'OVC', base: 1500 }], wxString: '+RA', fltCat: 'IFR', elev: 30 }],
+  fog: ['濃霧', { raw: '（示範）00000KT 0400 FG OVC002 12/12 Q1020', temp: 12, dewp: 12, altim: 1020, wdir: 0, wspd: 1, visib: .25, clouds: [{ cover: 'OVC', base: 200 }], wxString: 'FG', fltCat: 'LIFR', elev: 15 }],
+  night: ['夜間小雨', { raw: '（示範）09008KT 5000 -RA BKN012 OVC030 18/16 Q1014', temp: 18, dewp: 16, altim: 1014, wdir: 90, wspd: 8, visib: 3, clouds: [{ cover: 'BKN', base: 1200 }, { cover: 'OVC', base: 3000 }], wxString: '-RA', fltCat: 'MVFR', elev: -30 }]
+};
+let snap = null, mode = 'live';
+const cards = {};
+
+// ---------- 小工具 ----------
+const cl = (x, a, b) => Math.min(b, Math.max(a, x));
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const rgba = (c, a) => 'rgba(' + c.map(Math.round).join(',') + ',' + (a == null ? 1 : a) + ')';
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const rng = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const hm = ms => new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hour12: false }).format(ms);
+const dm = ms => new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(ms);
+
+// 太陽高度與時角（度）
+function sun(lat, lon) {
+  const R = Math.PI / 180, d = (Date.now() - 946728000000) / 864e5;
+  const L = (280.46 + .9856474 * d) % 360, g = ((357.528 + .9856003 * d) % 360) * R;
+  const lm = (L + 1.915 * Math.sin(g) + .02 * Math.sin(2 * g)) * R, ep = (23.439 - 4e-7 * d) * R;
+  const dec = Math.asin(Math.sin(ep) * Math.sin(lm)), ra = Math.atan2(Math.cos(ep) * Math.sin(lm), Math.cos(lm));
+  let ha = (280.46061837 + 360.98564736629 * d) % 360 + lon - ra / R;
+  ha = ((ha % 360) + 540) % 360 - 180;
+  const e = Math.asin(Math.sin(lat * R) * Math.sin(dec) + Math.cos(lat * R) * Math.cos(dec) * Math.cos(ha * R)) / R;
+  return { e, ha };
+}
+
+// ---------- 把 METAR 資料轉成場景參數 ----------
+function derive(d, m) {
+  let wx = d.wxString != null ? String(d.wxString) : String(d.raw || '').split(/RMK|TEMPO|BECMG/)[0].split(/\s+/)
+    .filter(t => /^([+-]|VC)?(MI|BC|PR|DR|BL|SH|TS|FZ)?(DZ|RA|SN|SG|PL|GR|GS|UP|BR|FG|HZ|FU|DU|SA|SS|DS|FC|SQ)*$/.test(t) && t).join(' ');
+  const s = { rain: 0, snow: 0, ts: /TS/.test(wx), fog: 0, hail: /GR|GS/.test(wx), wx };
+  wx.split(/\s+/).filter(Boolean).forEach(t => {
+    const k = t[0] === '+' ? 3 : t[0] === '-' ? 1 : 2;
+    if (/DZ/.test(t)) s.rain = Math.max(s.rain, 1);
+    if (/RA|GR|GS/.test(t)) s.rain = Math.max(s.rain, k);
+    if (/SN|SG|PL|IC/.test(t)) s.snow = Math.max(s.snow, k);
+    if (/FG/.test(t)) s.fog = Math.max(s.fog, .6);
+    if (/BR|FU/.test(t)) s.fog = Math.max(s.fog, .25);
+    if (/HZ|DU|SA/.test(t)) s.fog = Math.max(s.fog, .2);
+  });
+  const v = String(d.visib == null ? '6+' : d.visib);
+  s.vkm = v.slice(-1) === '+' ? 10 : Math.min(10, (parseFloat(v) || 6) * 1.609);
+  s.layers = (d.clouds || []).filter(c => COV[c.cover] != null && c.base != null).map(c => ({ cover: c.cover, base: c.base, cov: COV[c.cover] }));
+  s.cc = s.layers.reduce((a, l) => Math.max(a, l.cov), 0);
+  s.ceil = s.layers.filter(l => l.cov >= .75).reduce((a, l) => Math.min(a, l.base), Infinity);
+  s.cb = s.ts || /CB|TCU/.test(d.raw || '');
+  s.spd = Number(d.wspd) || 0; s.gst = Number(d.wgst) || 0;
+  s.vrb = d.wdir === 'VRB'; s.dir = Number(d.wdir) || 0;
+  s.temp = d.temp;
+  const sn = sun(m[2], m[3]);
+  s.e = d.elev != null ? d.elev : sn.e; s.ha = d.elev != null ? 0 : sn.ha;
+  return s;
+}
+
+// ---------- 場景 ----------
+function build(c) {
+  const s = c.s, r = rng(c.seed), k = c.W / 420, HY = c.H * .74;
+  c.clouds = [];
+  s.layers.forEach(L => {
+    const n = Math.max(1, Math.round(L.cov * 9));
+    for (let i = 0; i < n; i++) {
+      const sz = .7 + r() * .6;
+      c.clouds.push({
+        x: ((i + .5) / n) * 1.3 - .15 + (r() - .5) * .08,
+        y: HY - Math.min(L.base, 14000) / 14000 * c.H * .55 - 12 + (r() - .5) * 14,
+        sf: .6 + L.base / 14000 * .8,
+        b: Array.from({ length: 6 }, (_, j) => [(j - 2.5) * 28 * sz, -Math.sin(j * 1.3 + i) * 8 * sz, (22 + r() * 12) * sz])
+      });
+    }
+  });
+  const kind = s.snow ? s.snow : s.rain, n = s.snow ? [0, 25, 55, 100][kind] : [0, 45, 100, 180][kind];
+  c.drops = Array.from({ length: n * (c.W / 420) | 0 }, () => ({ x: r() * c.W, y: r() * c.H, l: .7 + r() * .6 }));
+  c.stars = Array.from({ length: 40 }, () => ({ x: r() * c.W, y: r() * HY * .8, p: r() * 6 }));
+  c.nextF = 1 + r() * 3; c.flash = 0; c.bolt = null;
+}
+
+function skyCols(e) {
+  const N = [[10, 16, 40], [30, 44, 82]], T = [[62, 72, 125], [250, 160, 110]], D = [[58, 138, 226], [172, 216, 250]];
+  if (e < -6) return N;
+  if (e < 2) { const t = (e + 6) / 8; return [mix(N[0], T[0], t), mix(N[1], T[1], t)]; }
+  if (e < 12) { const t = (e - 2) / 10; return [mix(T[0], D[0], t), mix(T[1], D[1], t)]; }
+  return D;
+}
+
+function draw(c, t, dt) {
+  const { ctx, W, H, s } = c, k = W / 420, HY = H * .74, e = s.e, df = cl((e + 6) / 18, 0, 1);
+  const pulse = .5 + .5 * Math.sin(t * 1.3 + Math.sin(t * .37) * 3);
+  const spd = s.spd + (s.gst > s.spd ? (s.gst - s.spd) * pulse : 0);
+  const dx = s.vrb ? Math.sin(t * .4) * .8 : Math.sin(s.dir * Math.PI / 180);
+  const wet = s.rain || s.snow || s.ts;
+
+  // 天空
+  let [top, bot] = skyCols(e);
+  const gf = cl(s.cc * .55 + (wet ? .25 : 0) + (s.cb ? .15 : 0), 0, .85), gray = mix([34, 40, 52], [150, 158, 170], df);
+  top = mix(top, gray, gf); bot = mix(bot, mix(gray, [255, 255, 255], .12), gf);
+  const g = ctx.createLinearGradient(0, 0, 0, HY); g.addColorStop(0, rgba(top)); g.addColorStop(1, rgba(bot));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  // 星、月、日
+  if (e < -4) {
+    const a = (1 - s.cc) * cl((-4 - e) / 6, 0, 1);
+    c.stars.forEach(o => { ctx.fillStyle = 'rgba(255,255,255,' + a * (.5 + .5 * Math.sin(t * 2 + o.p)) + ')'; ctx.fillRect(o.x, o.y, 1.5, 1.5); });
+  }
+  const vis = 1 - cl(s.cc * 1.05, 0, 1);
+  if (e > -3) {
+    const x = W * (.5 + cl(s.ha / 120, -.42, .42)), y = HY - cl(e, 0, 75) / 75 * HY * .82 - 8, hot = s.temp >= 33 ? 1.25 : 1;
+    const col = mix([255, 170, 90], [255, 245, 215], cl(e / 20, 0, 1)), r = 16 * k * hot;
+    const gg = ctx.createRadialGradient(x, y, 0, x, y, r * 5); gg.addColorStop(0, rgba(col, .55 * vis)); gg.addColorStop(1, rgba(col, 0));
+    ctx.fillStyle = gg; ctx.fillRect(x - r * 5, y - r * 5, r * 10, r * 10);
+    ctx.fillStyle = rgba(col, .4 + .6 * vis); ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  } else {
+    ctx.fillStyle = 'rgba(235,238,245,' + (.15 + .85 * vis) + ')'; ctx.beginPath(); ctx.arc(W * .78, H * .2, 10 * k, 0, 7); ctx.fill();
+  }
+
+  // 雲
+  const lc = mix([70, 78, 98], [250, 251, 253], df), storm = cl(s.rain / 4 + (s.ts ? .5 : 0) + (s.ceil < 2500 ? .25 : 0) + (s.cb ? .3 : 0), 0, 1);
+  ctx.fillStyle = rgba(mix(lc, mix([60, 64, 74], [110, 114, 124], df), storm), .93);
+  c.clouds.forEach(o => {
+    o.x += dx * (6 + spd * 2.4) * k * o.sf * dt / W;
+    if (o.x > 1.15) o.x = -.15; if (o.x < -.15) o.x = 1.15;
+    ctx.beginPath();
+    o.b.forEach(b => { const px = o.x * W + b[0] * k, py = o.y + b[1] * k; ctx.moveTo(px + b[2] * k, py); ctx.arc(px, py, b[2] * k, 0, 7); });
+    ctx.fill();
+  });
+
+  // 地面、跑道、塔台
+  ctx.fillStyle = rgba(mix([20, 34, 28], [58, 98, 60], df)); ctx.fillRect(0, HY, W, H - HY);
+  const ry = HY + (H - HY) * .42, rh = (H - HY) * .34;
+  ctx.fillStyle = rgba(mix([30, 32, 38], [78, 80, 88], df)); ctx.fillRect(0, ry, W, rh);
+  ctx.fillStyle = 'rgba(255,255,255,.55)';
+  for (let x = 6; x < W; x += 34 * k) ctx.fillRect(x, ry + rh / 2 - 1, 16 * k, 2);
+  ctx.fillStyle = rgba(mix([14, 18, 28], [72, 78, 92], df));
+  ctx.fillRect(W * .1, HY - 26 * k, 7 * k, 26 * k); ctx.fillRect(W * .1 - 5 * k, HY - 34 * k, 17 * k, 9 * k);
+
+  // 風向袋
+  const px = W * .9, py = HY + (H - HY) * .22, len = 34 * k, sg = dx >= 0 ? 1 : -1;
+  const ang = (1 - Math.min(spd, 15) / 15) * 1.2 + Math.sin(t * 6) * .05 * Math.min(spd, 15) / 15;
+  const tx = px + sg * len * Math.cos(ang), ty = py - len + len * Math.sin(ang), n1 = 4 * k;
+  ctx.strokeStyle = '#9aa4b2'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py - len); ctx.stroke();
+  ctx.fillStyle = '#ff8a3d'; ctx.beginPath(); ctx.moveTo(px, py - len - n1); ctx.lineTo(tx, ty - n1 * .5); ctx.lineTo(tx, ty + n1 * .5); ctx.lineTo(px, py - len + n1); ctx.fill();
+
+  // 霧、霾
+  const fa = Math.max(cl((10 - s.vkm) / 10, 0, 1) * .8, s.fog * .6);
+  if (fa > .02) {
+    const fc = mix([90, 98, 112], [222, 228, 236], df), fg = ctx.createLinearGradient(0, 0, 0, H);
+    fg.addColorStop(0, rgba(fc, fa * .55)); fg.addColorStop(1, rgba(fc, fa)); ctx.fillStyle = fg; ctx.fillRect(0, 0, W, H);
+  }
+
+  // 雨、雪
+  if (c.drops.length) {
+    const vy = (s.snow ? 55 : 520) * k, vx = dx * spd * (s.snow ? 3 : 9) * k;
+    if (s.snow) ctx.fillStyle = 'rgba(255,255,255,.85)'; else { ctx.strokeStyle = 'rgba(195,215,240,.55)'; ctx.lineWidth = Math.max(1, k); ctx.beginPath(); }
+    c.drops.forEach((o, i) => {
+      o.x += (vx + (s.snow ? Math.sin(t + i) * 10 : 0)) * o.l * dt; o.y += vy * o.l * dt;
+      if (o.y > H) { o.y = -10; o.x = Math.random() * W; }
+      if (o.x > W + 30) o.x -= W + 60; if (o.x < -30) o.x += W + 60;
+      if (s.snow) { ctx.beginPath(); ctx.arc(o.x, o.y, 1.4 * k * o.l, 0, 7); ctx.fill(); }
+      else { ctx.moveTo(o.x, o.y); ctx.lineTo(o.x - vx * .03 * o.l, o.y - vy * .03 * o.l); }
+    });
+    if (!s.snow) ctx.stroke();
+  }
+
+  // 閃電
+  if (s.ts) {
+    if (t > c.nextF) {
+      c.flash = 1; c.nextF = t + 2 + Math.random() * 6;
+      let x = W * (.15 + Math.random() * .7), y = HY * .45; c.bolt = [[x, y]];
+      while (y < HY) { y += 14 * k; x += (Math.random() - .5) * 26 * k; c.bolt.push([x, y]); }
+      c.boltT = t;
+    }
+    if (t - c.boltT < .15 && c.bolt) {
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * k; ctx.shadowColor = '#bcd7ff'; ctx.shadowBlur = 14; ctx.beginPath();
+      c.bolt.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); ctx.shadowBlur = 0;
+    }
+    if (c.flash > 0) { ctx.fillStyle = 'rgba(255,255,255,' + c.flash * .3 + ')'; ctx.fillRect(0, 0, W, H); c.flash -= dt * 5; }
+  }
+}
+
+// ---------- 卡片 ----------
+function resize(c) {
+  const dpr = window.devicePixelRatio || 1;
+  c.W = c.cv.clientWidth; c.H = c.cv.clientHeight;
+  c.cv.width = c.W * dpr; c.cv.height = c.H * dpr; c.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (c.s) build(c);
+}
+
+function ensure(key) {
+  if (cards[key]) return cards[key];
+  const el = document.createElement('section'); el.className = 'card';
+  el.innerHTML = '<div class="sc"><canvas></canvas><div class="tag"></div><div class="cat"></div><div class="bd"></div></div><div class="info"></div>';
+  document.getElementById('main').appendChild(el);
+  const cv = el.querySelector('canvas');
+  const c = cards[key] = { el, cv, ctx: cv.getContext('2d'), seed: key.charCodeAt(0) * 97 + key.charCodeAt(1) };
+  new ResizeObserver(() => resize(c)).observe(cv); resize(c);
+  return c;
+}
+
+function upsert(key, d) {
+  const m = META[key], c = ensure(key), s = c.s = derive(d, m);
+  build(c);
+  const comp = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+  const wind = s.vrb ? '風向不定' : '<span class="ar" style="display:inline-block;transform:rotate(' + (s.dir + 180) + 'deg)">↑</span>' + comp[Math.round(s.dir / 45) % 8] + '風 ' + s.dir + '°';
+  const age = d.obsTime ? Math.max(0, Math.round((Date.now() / 1000 - d.obsTime) / 60)) : null;
+  const visT = s.vkm >= 10 ? '10 km 以上' : s.vkm.toFixed(1) + ' km';
+  const cat = d.fltCat || '—';
+  c.el.querySelector('.tag').innerHTML = esc(d.name || m[1]) + '<small>' + (d.icao || m[0]) + ' · ' + key + '</small>';
+  const ce = c.el.querySelector('.cat'); ce.textContent = cat; ce.style.background = CATC[cat] || '#556';
+  const bd = [];
+  if (s.spd >= 34) bd.push('暴風 ' + s.spd + ' kt'); else if (s.spd >= 22 || s.gst >= 34) bd.push('強風');
+  if (s.ts) bd.push('雷暴'); else if (s.rain) bd.push(['', '小雨', '雨', '大雨'][s.rain]); if (s.snow) bd.push('雪');
+  if (s.wx.indexOf('FG') >= 0) bd.push('霧'); else if (/BR|FU/.test(s.wx)) bd.push('薄霧'); else if (/HZ/.test(s.wx)) bd.push('霾');
+  if (s.ceil < 1000) bd.push('低雲幕'); if (s.temp >= 33) bd.push('酷熱');
+  c.el.querySelector('.bd').innerHTML = bd.map(x => '<span>' + x + '</span>').join('');
+  c.el.querySelector('.info').innerHTML =
+    '<div class="f"><b>風</b>' + wind + '　' + s.spd + ' kt' + (s.gst ? '，陣風 ' + s.gst + ' kt' : '') + '</div>' +
+    '<div><b>能見度</b>' + visT + '</div>' +
+    '<div><b>雲幕</b>' + (isFinite(s.ceil) ? s.ceil.toLocaleString() + ' ft' : '無') + '</div>' +
+    '<div class="f"><b>雲</b>' + (s.layers.length ? s.layers.map(l => l.cover + ' ' + l.base.toLocaleString() + ' ft').join('、') : '無雲／CAVOK') + '</div>' +
+    '<div><b>氣溫／露點</b>' + d.temp + '°C ／ ' + d.dewp + '°C</div>' +
+    '<div><b>氣壓</b>' + d.altim + ' hPa</div>' +
+    '<div class="f"><b>觀測（台北時間）</b>' + (d.obsTime ? dm(d.obsTime * 1000) + '，' + age + ' 分鐘前' : '—') + '</div>' +
+    '<div class="f raw">' + esc(d.raw || '') + '</div>';
+}
+
+// ---------- 資料 ----------
+function demo(key) {
+  const d = Object.assign({}, PRE[key][1]);
+  const out = { updated: Date.now(), airports: {} };
+  for (const k in META) out.airports[k] = Object.assign({ icao: META[k][0], name: META[k][1], obsTime: Date.now() / 1000 - 600 }, d);
+  return out;
+}
+
+function render() {
+  const msg = document.getElementById('msg'), bar = document.getElementById('bar');
+  let src = mode === 'live' ? snap : demo(mode);
+  if (mode === 'live' && API.indexOf('http') !== 0) {
+    msg.style.display = 'block'; msg.textContent = '尚未設定資料來源：請把程式最上方的 API 改成你的 GAS /exec 網址。目前顯示示範資料。';
+    src = demo('sunny');
+  }
+  if (!src || !src.airports) return;
+  for (const k in META) if (src.airports[k]) upsert(k, src.airports[k]);
+  const age = Math.round((Date.now() - src.updated) / 60000);
+  document.getElementById('st').textContent = mode === 'live' ? '快照 ' + hm(src.updated) + '（' + age + ' 分鐘前）' : '示範情境';
+  bar.className = 'bar' + (mode === 'live' && age > 15 ? ' old' : '');
+}
+
+async function load() {
+  if (API.indexOf('http') !== 0) { render(); return; }
+  try {
+    const res = await fetch(API);
+    snap = await res.json();
+    document.getElementById('msg').style.display = 'none';
+  } catch (e) {
+    const m = document.getElementById('msg');
+    m.style.display = 'block'; m.textContent = '讀取失敗，顯示上一次的資料。請確認 /exec 網址與部署權限（存取權要選「所有人」）。';
+  }
+  render();
+}
+
+const sel = document.getElementById('mode');
+sel.innerHTML = '<option value="live">即時資料</option>' + Object.keys(PRE).map(k => '<option value="' + k + '">預覽：' + PRE[k][0] + '</option>').join('');
+sel.onchange = () => { mode = sel.value; render(); };
+
+let last = performance.now();
+(function loop(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  for (const k in cards) if (cards[k].s && cards[k].W) draw(cards[k], now / 1000, dt);
+  requestAnimationFrame(loop);
+})(last);
+
+load(); setInterval(load, 60000);
+</script>
+</body>
+</html>
