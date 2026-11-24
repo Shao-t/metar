@@ -2,24 +2,25 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="METAR">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <title>機場天氣場景</title>
 <style>
-:root{--g:#202020;--w:#fff;--ash:#efefef;--fog:#f5f5f5;--steel:#4d4d4d;--slate:#828282;--mist:#e8e8e8;--ember:#ff682c;--brass:#816729;
+:root{--g:#202020;--w:#fff;--ash:#efefef;--fog:#f5f5f5;--steel:#4d4d4d;--slate:#595959;--mist:#e8e8e8;--ember:#ff682c;--brass:#816729;
 --head:"Inter Tight","Space Grotesk","Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--body:"Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
 *{box-sizing:border-box}
 body{margin:0;background:var(--w);color:var(--g);font:400 15px/1.5 var(--body)}
 nav{max-width:1200px;margin:0 auto;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 .logo,h1,.btn,.nm,.tg,.widget h2,.sr b,.cat,summary{font-family:var(--head);font-weight:400;letter-spacing:-.02em}
-.logo{font-size:20px}
-.pill{background:var(--ash);border-radius:200px;padding:8px 18px;font:400 13px var(--head);letter-spacing:-.02em;color:var(--steel)}
-.old #st{color:var(--ember)}
-.hero{max-width:1200px;margin:0 auto;padding:60px 24px 80px}
-.cap{margin:0 0 20px;font:400 13px var(--head);letter-spacing:-.02em;color:var(--brass)}
-h1{margin:0 0 20px;font-size:clamp(44px,8vw,66px);line-height:.91}
-.sub{margin:0 0 36px;max-width:560px;font-size:18px;line-height:1.25;color:var(--steel)}
+.logo{margin:0;font-size:20px}
+.pill{border:1px solid transparent;background:var(--ash);border-radius:200px;padding:8px 18px;font:400 13px var(--head);letter-spacing:-.02em;color:var(--steel)}
+.pill.old{border-color:var(--ember)}
 .btn{font-size:16px;line-height:1;padding:10px 20px;border-radius:0;border:1px solid var(--g);background:transparent;color:var(--g);cursor:pointer;margin:0 8px 8px 0}
 .btn.p{background:var(--g);color:var(--w)}
 .btn:focus-visible,summary:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
@@ -43,7 +44,8 @@ canvas{display:block;width:100%;height:210px}
 .cat{position:absolute;top:16px;right:16px}
 .bd{position:absolute;left:16px;bottom:12px;display:flex;gap:6px;flex-wrap:wrap}
 .bd span{background:rgba(255,255,255,.9);border-radius:20px;padding:0 10px;font-size:12px}
-.bd .a{color:var(--ember)}
+.bd .a{border:1px solid var(--ember)}
+.bd .a::before,.al::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ember);margin-right:6px}
 .info{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px}
 .info b{display:block;margin-bottom:2px;font:500 12px var(--body);color:var(--slate)}
 .f{grid-column:1/-1}
@@ -61,23 +63,53 @@ nav .btn{font-size:14px;padding:8px 14px;margin:0}
 .more .dec{margin:4px 0 0}
 footer{background:var(--ash);padding:60px 0}
 footer p{max-width:1200px;margin:0 auto;padding:0 24px;font-size:14px;line-height:1.5;color:var(--steel)}
+html{-webkit-text-size-adjust:100%}
+a.sr{color:inherit;text-decoration:none}
+a.sr:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+.no{color:var(--slate)}
+:root{color-scheme:light}
+body{-webkit-tap-highlight-color:transparent}
+select.btn{-webkit-appearance:none;appearance:none;border-radius:0}
+nav{padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+footer{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+.chips{display:none}
+@media(max-width:700px){
+  nav{flex-direction:column;align-items:stretch;gap:10px;padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-left)) 10px max(16px,env(safe-area-inset-right))}
+  .nr{justify-content:space-between}
+  .pill{flex:1 0 100%;text-align:center}
+  nav .btn,select.btn{min-height:44px;font-size:16px}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 8px;-webkit-overflow-scrolling:touch}
+  .chip{flex:none;padding:6px 12px;border:1px solid var(--g);border-radius:20px;font:400 14px var(--head);color:var(--g);text-decoration:none;white-space:nowrap}
+  .chip.a{border-color:var(--ember)}
+  main{padding:8px 16px 40px;gap:16px}
+  canvas{height:170px}
+  .band{padding:40px 0}
+  .widget{padding:20px 16px;border-radius:12px}
+  .sr{display:flex;flex-wrap:wrap;gap:4px 12px;min-width:0}
+  .sr.h{display:none}
+  summary{min-height:44px;line-height:26px}
+}
+.sc canvas.fx{position:absolute;left:0;top:0;pointer-events:none}
+.fg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 </style>
 </head>
 <body>
 <nav>
-  <span class="logo">METAR 機場天氣</span>
+  <h1 class="logo">METAR 機場天氣</h1>
   <div class="nr">
     <div class="pill" id="bar"><span id="st">載入中…</span></div>
     <button class="btn p" id="rf">重新整理</button>
+    <button class="btn" id="pw" aria-label="動畫模式"></button>
     <select class="btn" id="mode" aria-label="預覽情境"></select>
   </div>
 </nav>
+<div class="chips" id="chips"></div>
 <div id="msg"></div>
 <main id="main"></main>
 <section class="band"><div class="wrap"><div class="widget" id="sum"></div></div></section>
 <footer><p>場景朝南看：左側是東、右側是西。順逆風與側風以 METAR 風向（真北）對照跑道真方位計算，只是參考，不等於各機型的作業限制；側風 20 kt 以上會標示注意。跑道取自公開資料：松山 10/28、桃園 05/23、虹橋 18/36、浦東 16/17 與 34/35。METAR 沒有颱風欄位，強風與暴風標籤只依風速判斷。</p></footer>
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbw2nt_3kBe7CtRSq7YItqpalquu2rsvqP8f5TR6jUjSiu9IKvp7d3gzSIqncKZ6uKGL/exec';
+const API = '貼上你的 GAS /exec 網址';
 const META = {
   TSA: ['RCSS', '松山', 25.0697, 121.5522],
   TPE: ['RCTP', '桃園', 25.0777, 121.2328],
@@ -93,7 +125,7 @@ const PRE = {
   fog: ['濃霧', { raw: '（示範）00000KT 0400 FG OVC002 12/12 Q1020', temp: 12, dewp: 12, altim: 1020, wdir: 0, wspd: 1, visib: .25, clouds: [{ cover: 'OVC', base: 200 }], wxString: 'FG', fltCat: 'LIFR', elev: 15 }],
   night: ['夜間小雨', { raw: '（示範）09008KT 5000 -RA BKN012 OVC030 18/16 Q1014', temp: 18, dewp: 16, altim: 1014, wdir: 90, wspd: 8, visib: 3, clouds: [{ cover: 'BKN', base: 1200 }, { cover: 'OVC', base: 3000 }], wxString: '-RA', fltCat: 'MVFR', elev: -30 }]
 };
-let snap = null, mode = 'live';
+let snap = null, hist = null, mode = 'live', sig = '', est = 600000, lastOk = 0, timer = null, fails = 0, late = 0, pending = false, stSrc = null;
 const cards = {};
 
 // ---------- 小工具 ----------
@@ -102,8 +134,8 @@ const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 const rgba = (c, a) => 'rgba(' + c.map(Math.round).join(',') + ',' + (a == null ? 1 : a) + ')';
 const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const rng = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-const hm = ms => new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hour12: false }).format(ms);
-const dm = ms => new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(ms);
+const hm = ms => new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
+const dm = ms => new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(ms);
 
 // 太陽高度與時角（度）
 function sun(lat, lon) {
@@ -152,6 +184,7 @@ function derive(d, m) {
 function build(c) {
   const s = c.s, r = rng(c.seed), k = c.W / 420, HY = c.H * .74;
   c.clouds = [];
+  c.cvar = Array.from({ length: 4 }, () => Array.from({ length: 6 }, (_, j) => [(j - 2.5) * 28, -Math.sin(j * 1.3 + r() * 6) * 8, 22 + r() * 12]));
   s.layers.forEach(L => {
     const n = Math.max(1, Math.round(L.cov * 9));
     for (let i = 0; i < n; i++) {
@@ -160,14 +193,14 @@ function build(c) {
         x: ((i + .5) / n) * 1.3 - .15 + (r() - .5) * .08,
         y: HY - Math.min(L.base, 14000) / 14000 * c.H * .55 - 12 + (r() - .5) * 14,
         sf: .6 + L.base / 14000 * .8,
-        b: Array.from({ length: 6 }, (_, j) => [(j - 2.5) * 28 * sz, -Math.sin(j * 1.3 + i) * 8 * sz, (22 + r() * 12) * sz])
+        sz, v: i % 4
       });
     }
   });
   const kind = s.snow ? s.snow : s.rain, n = s.snow ? [0, 25, 55, 100][kind] : [0, 45, 100, 180][kind];
   c.drops = Array.from({ length: n * (c.W / 420) | 0 }, () => ({ x: r() * c.W, y: r() * c.H, l: .7 + r() * .6, gy: HY + 6 + r() * (c.H - HY - 10) }));
   c.stars = Array.from({ length: 40 }, () => ({ x: r() * c.W, y: r() * HY * .8, p: r() * 6 }));
-  c.nextF = 1 + r() * 3; c.flash = 0; c.bolt = null; c.sp = [];
+  c.nextF = 1 + r() * 3; c.flash = 0; c.bolt = null; c.sp = []; c.dirty = true;
 }
 
 function skyCols(e) {
@@ -178,24 +211,18 @@ function skyCols(e) {
   return D;
 }
 
-function draw(c, t, dt) {
-  const { ctx, W, H, s } = c, k = W / 420, HY = H * .74, e = s.e, df = cl((e + 6) / 18, 0, 1);
-  const pulse = .5 + .5 * Math.sin(t * 1.3 + Math.sin(t * .37) * 3);
-  const spd = s.spd + (s.gst > s.spd ? (s.gst - s.spd) * pulse : 0);
-  const dx = s.vrb ? Math.sin(t * .4) * .8 : Math.sin(s.dir * Math.PI / 180);
-  const wet = s.rain || s.snow || s.ts;
-
-  // 天空
+// 靜態層：天空、星、日月、地面、跑道、航廈、塔台、跑道燈。只在資料、尺寸或太陽位置改變時重畫
+function paintBg(c) {
+  const ctx = c.bctx, W = c.W, H = c.H, s = c.s, k = W / 420, HY = H * .74, e = s.e, df = cl((e + 6) / 18, 0, 1);
+  ctx.clearRect(0, 0, W, H);
   let [top, bot] = skyCols(e);
-  const gf = cl(s.cc * .55 + (wet ? .25 : 0) + (s.cb ? .15 : 0), 0, .85), gray = mix([34, 40, 52], [150, 158, 170], df);
+  const gf = cl(s.cc * .55 + (s.rain || s.snow || s.ts ? .25 : 0) + (s.cb ? .15 : 0), 0, .85), gray = mix([34, 40, 52], [150, 158, 170], df);
   top = mix(top, gray, gf); bot = mix(bot, mix(gray, [255, 255, 255], .12), gf);
   const g = ctx.createLinearGradient(0, 0, 0, HY); g.addColorStop(0, rgba(top)); g.addColorStop(1, rgba(bot));
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-
-  // 星、月、日
   if (e < -4) {
-    const a = (1 - s.cc) * cl((-4 - e) / 6, 0, 1);
-    c.stars.forEach(o => { ctx.fillStyle = 'rgba(255,255,255,' + a * (.5 + .5 * Math.sin(t * 2 + o.p)) + ')'; ctx.fillRect(o.x, o.y, 1.5, 1.5); });
+    ctx.fillStyle = 'rgba(255,255,255,' + (.75 * (1 - s.cc) * cl((-4 - e) / 6, 0, 1)) + ')';
+    c.stars.forEach(o => ctx.fillRect(o.x, o.y, 1.5, 1.5));
   }
   const vis = 1 - cl(s.cc * 1.05, 0, 1);
   if (e > -3) {
@@ -207,48 +234,71 @@ function draw(c, t, dt) {
   } else {
     ctx.fillStyle = 'rgba(235,238,245,' + (.15 + .85 * vis) + ')'; ctx.beginPath(); ctx.arc(W * .78, H * .2, 10 * k, 0, 7); ctx.fill();
   }
-
   if (e > -4 && e < 14) {
     const ga = (1 - Math.abs(e - 3) / 11) * (1 - s.cc * .6) * .5, gx = W * (.5 + cl(s.ha / 120, -.42, .42));
     const gl = ctx.createRadialGradient(gx, HY, 0, gx, HY, W * .6);
     gl.addColorStop(0, 'rgba(255,104,44,' + ga + ')'); gl.addColorStop(1, 'rgba(255,104,44,0)');
     ctx.fillStyle = gl; ctx.fillRect(0, 0, W, HY);
   }
-  // 雲
-  const lc = mix([70, 78, 98], [250, 251, 253], df), storm = cl(s.rain / 4 + (s.ts ? .5 : 0) + (s.ceil < 2500 ? .25 : 0) + (s.cb ? .3 : 0), 0, 1);
-  const cc0 = mix(lc, mix([60, 64, 74], [110, 114, 124], df), storm);
-  c.clouds.forEach(o => {
-    o.x += dx * (6 + spd * 2.4) * k * o.sf * dt / W;
-    if (o.x > 1.15) o.x = -.15; if (o.x < -.15) o.x = 1.15;
-    [[5, mix(cc0, [0, 0, 0], .14), .9], [0, cc0, .93]].forEach(q => {
-      ctx.fillStyle = rgba(q[1], q[2]); ctx.beginPath();
-      o.b.forEach(b => { const px = o.x * W + b[0] * k, py = o.y + (b[1] + q[0]) * k; ctx.moveTo(px + b[2] * k, py); ctx.arc(px, py, b[2] * k, 0, 7); });
-      ctx.fill();
-    });
-  });
-
-  // 地面、跑道、塔台
   ctx.fillStyle = rgba(mix([20, 34, 28], [58, 98, 60], df)); ctx.fillRect(0, HY, W, H - HY);
-  const ry = HY + (H - HY) * .42, rh = (H - HY) * .34;
+  const ry = HY + (H - HY) * .42, rh = (H - HY) * .34, dk = rgba(mix([14, 18, 28], [72, 78, 92], df));
   ctx.fillStyle = rgba(mix([30, 32, 38], [78, 80, 88], df)); ctx.fillRect(0, ry, W, rh);
   ctx.fillStyle = 'rgba(255,255,255,.55)';
   for (let x = 6; x < W; x += 34 * k) ctx.fillRect(x, ry + rh / 2 - 1, 16 * k, 2);
-  ctx.fillStyle = rgba(mix([14, 18, 28], [72, 78, 92], df));
-  ctx.fillRect(W * .1, HY - 26 * k, 7 * k, 26 * k); ctx.fillRect(W * .1 - 5 * k, HY - 34 * k, 17 * k, 9 * k);
+  ctx.fillStyle = dk;
+  ctx.fillRect(W * .1, HY - 26 * k, 7 * k, 26 * k); ctx.fillRect(W * .1 - 5 * k, HY - 34 * k, 17 * k, 9 * k); ctx.fillRect(W * .2, HY - 10 * k, W * .24, 10 * k);
+  if (e < 4) {
+    ctx.fillStyle = 'rgba(255,205,120,' + cl((4 - e) / 8, 0, 1) + ')';
+    for (let x = 8; x < W; x += 16 * k) { ctx.fillRect(x, ry - 1, 2 * k, 2 * k); ctx.fillRect(x, ry + rh - 1, 2 * k, 2 * k); }
+  }
+  const fa = Math.max(cl((10 - s.vkm) / 10, 0, 1) * .8, s.fog * .6), fc = mix([90, 98, 112], [222, 228, 236], df);
+  c.fg.style.background = fa > .02 ? 'linear-gradient(' + rgba(fc, fa * .55) + ',' + rgba(fc, fa) + ')' : 'none';
+}
 
-  // 航廈、樹、跑道燈、起降的飛機
-  const dk = rgba(mix([14, 18, 28], [72, 78, 92], df));
-  ctx.fillStyle = dk; ctx.fillRect(W * .2, HY - 10 * k, W * .24, 10 * k);
+// 雲只畫一次成小圖，之後每幀只貼圖
+function makeSprites(c) {
+  const s = c.s, k = c.W / 420, df = cl((s.e + 6) / 18, 0, 1), dpr = c.dpr || 1;
+  const storm = cl(s.rain / 4 + (s.ts ? .5 : 0) + (s.ceil < 2500 ? .25 : 0) + (s.cb ? .3 : 0), 0, 1);
+  const base = mix(mix([70, 78, 98], [250, 251, 253], df), mix([60, 64, 74], [110, 114, 124], df), storm);
+  c.spr = c.cvar.map(v => {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    v.forEach(b => { x0 = Math.min(x0, b[0] - b[2]); x1 = Math.max(x1, b[0] + b[2]); y0 = Math.min(y0, b[1] - b[2]); y1 = Math.max(y1, b[1] + b[2] + 5); });
+    const w = (x1 - x0) * k, h = (y1 - y0) * k, cv = document.createElement('canvas'), x = cv.getContext('2d');
+    cv.width = Math.ceil(w * dpr); cv.height = Math.ceil(h * dpr); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    [[5, mix(base, [0, 0, 0], .14), .9], [0, base, .93]].forEach(q => {
+      x.fillStyle = rgba(q[1], q[2]); x.beginPath();
+      v.forEach(b => { const px = (b[0] - x0) * k, py = (b[1] - y0 + q[0]) * k; x.moveTo(px + b[2] * k, py); x.arc(px, py, b[2] * k, 0, 7); });
+      x.fill();
+    });
+    return { cv, w, h, ox: -x0 * k, oy: -y0 * k };
+  });
+}
+
+// 前景：只畫會動的東西。dt = 0 代表靜態畫面（省電模式），不推進任何動畫
+function draw(c, t, dt) {
+  if (c.dirty) { paintBg(c); makeSprites(c); c.dirty = false; }
+  const { ctx, W, H, s } = c, k = W / 420, HY = H * .74, e = s.e, df = cl((e + 6) / 18, 0, 1);
+  const pulse = .5 + .5 * Math.sin(t * 1.3 + Math.sin(t * .37) * 3);
+  const spd = s.spd + (s.gst > s.spd ? (s.gst - s.spd) * pulse : 0);
+  const dx = s.vrb ? Math.sin(t * .4) * .8 : Math.sin(s.dir * Math.PI / 180);
+  const ry = HY + (H - HY) * .42, rh = (H - HY) * .34, dk = rgba(mix([14, 18, 28], [72, 78, 92], df));
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, HY + 2); ctx.clip();
+  c.clouds.forEach(o => {
+    o.x += dx * (6 + spd * 2.4) * k * o.sf * dt / W;
+    if (o.x > 1.15) o.x = -.15; if (o.x < -.15) o.x = 1.15;
+    const q = c.spr[o.v];
+    ctx.drawImage(q.cv, o.x * W - q.ox * o.sz, o.y - q.oy * o.sz, q.w * o.sz, q.h * o.sz);
+  });
+  ctx.restore();
+
   const lean = dx * Math.min(spd, 30) / 30 * 9 * k;
   [.52, .58, .66].forEach((fx, i) => {
     const bx = W * fx, sw = lean + Math.sin(t * 2 + i) * Math.min(spd, 30) / 30 * 2.5 * k;
     ctx.strokeStyle = dk; ctx.lineWidth = 2 * k; ctx.beginPath(); ctx.moveTo(bx, HY + 4 * k); ctx.lineTo(bx + sw * .5, HY - 14 * k); ctx.stroke();
     ctx.fillStyle = rgba(mix([30, 40, 34], [92, 110, 84], df)); ctx.beginPath(); ctx.arc(bx + sw, HY - 18 * k, 8 * k, 0, 7); ctx.fill();
   });
-  if (e < 4) {
-    ctx.fillStyle = 'rgba(255,205,120,' + cl((4 - e) / 8, 0, 1) + ')';
-    for (let x = 8; x < W; x += 16 * k) { ctx.fillRect(x, ry - 1, 2 * k, 2 * k); ctx.fillRect(x, ry + rh - 1, 2 * k, 2 * k); }
-  }
   if (c.land) {
     const pr = ((t + c.seed % 7) % 16) / 16, gy = ry + rh * .5, y0 = HY - 70 * k, fl = pr < .4;
     const sx = c.land > 0 ? -.1 : 1.1, ex = c.land > 0 ? 1.1 : -.1, sc = k * (.8 + .5 * (fl ? pr / .4 : 1));
@@ -259,22 +309,14 @@ function draw(c, t, dt) {
     ctx.beginPath(); ctx.moveTo(-12 * sc, -sc); ctx.lineTo(-15 * sc, -7 * sc); ctx.lineTo(-11 * sc, -sc); ctx.fill(); ctx.restore();
   }
 
-  // 風向袋
   const px = W * .9, py = HY + (H - HY) * .22, len = 34 * k, sg = dx >= 0 ? 1 : -1;
   const ang = (1 - Math.min(spd, 15) / 15) * 1.2 + Math.sin(t * 6) * .05 * Math.min(spd, 15) / 15;
   const tx = px + sg * len * Math.cos(ang), ty = py - len + len * Math.sin(ang), n1 = 4 * k;
   ctx.strokeStyle = '#9aa4b2'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py - len); ctx.stroke();
   ctx.fillStyle = '#ff8a3d'; ctx.beginPath(); ctx.moveTo(px, py - len - n1); ctx.lineTo(tx, ty - n1 * .5); ctx.lineTo(tx, ty + n1 * .5); ctx.lineTo(px, py - len + n1); ctx.fill();
 
-  // 霧、霾
-  const fa = Math.max(cl((10 - s.vkm) / 10, 0, 1) * .8, s.fog * .6);
-  if (fa > .02) {
-    const fc = mix([90, 98, 112], [222, 228, 236], df), fg = ctx.createLinearGradient(0, 0, 0, H);
-    fg.addColorStop(0, rgba(fc, fa * .55)); fg.addColorStop(1, rgba(fc, fa)); ctx.fillStyle = fg; ctx.fillRect(0, 0, W, H);
-  }
-
-  // 雨、雪
   if (c.drops.length) {
+    const tl = Math.max(.03, Math.min(dt, .08));                       // 幀率低時拉長雨絲，視覺上仍連續
     const vy = (s.snow ? 55 : 520) * k, vx = dx * spd * (s.snow ? 3 : 9) * k;
     if (s.snow) ctx.fillStyle = 'rgba(255,255,255,.85)'; else { ctx.strokeStyle = 'rgba(195,215,240,.55)'; ctx.lineWidth = Math.max(1, k); ctx.beginPath(); }
     c.drops.forEach((o, i) => {
@@ -282,7 +324,7 @@ function draw(c, t, dt) {
       if (o.y > (o.gy || H)) { if (!s.snow && o.gy && c.sp.length < 40) c.sp.push({ x: o.x, y: o.gy, a: 0 }); o.y = -10; o.x = Math.random() * W; }
       if (o.x > W + 30) o.x -= W + 60; if (o.x < -30) o.x += W + 60;
       if (s.snow) { ctx.beginPath(); ctx.arc(o.x, o.y, 1.4 * k * o.l, 0, 7); ctx.fill(); }
-      else { ctx.moveTo(o.x, o.y); ctx.lineTo(o.x - vx * .03 * o.l, o.y - vy * .03 * o.l); }
+      else { ctx.moveTo(o.x, o.y); ctx.lineTo(o.x - vx * tl * o.l, o.y - vy * tl * o.l); }
     });
     if (!s.snow) ctx.stroke();
     c.sp = c.sp.filter(q => (q.a += dt * 3) < 1); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1;
@@ -290,8 +332,7 @@ function draw(c, t, dt) {
     ctx.globalAlpha = 1;
   }
 
-  // 閃電
-  if (s.ts) {
+  if (s.ts && dt > 0) {
     if (t > c.nextF) {
       c.flash = 1; c.nextF = t + 2 + Math.random() * 6;
       let x = W * (.15 + Math.random() * .7), y = HY * .45; c.bolt = [[x, y]];
@@ -308,20 +349,23 @@ function draw(c, t, dt) {
 
 // ---------- 卡片 ----------
 function resize(c) {
-  const dpr = window.devicePixelRatio || 1;
-  c.W = c.cv.clientWidth; c.H = c.cv.clientHeight;
-  c.cv.width = c.W * dpr; c.cv.height = c.H * dpr; c.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  c.W = c.cv.clientWidth; c.H = c.cv.clientHeight; c.dpr = dpr;
+  [[c.cv, c.bctx], [c.fcv, c.ctx]].forEach(p => { p[0].width = c.W * dpr; p[0].height = c.H * dpr; p[1].setTransform(dpr, 0, 0, dpr, 0, 0); });
   if (c.s) build(c);
+  need = true; kick();
 }
 
 function ensure(key) {
   if (cards[key]) return cards[key];
   const el = document.createElement('section'); el.className = 'card';
-  el.innerHTML = '<div class="sc"><canvas></canvas><div class="nm"></div><div class="cat"></div><div class="bd"></div></div><div class="info"></div>';
+  el.innerHTML = '<div class="sc"><canvas class="bg"></canvas><canvas class="fx" aria-hidden="true"></canvas><div class="fg"></div><div class="nm"></div><div class="cat"></div><div class="bd"></div></div><div class="info"></div>';
   document.getElementById('main').appendChild(el);
-  const cv = el.querySelector('canvas');
-  const c = cards[key] = { el, cv, ctx: cv.getContext('2d'), seed: key.charCodeAt(0) * 97 + key.charCodeAt(1) };
-  new ResizeObserver(() => resize(c)).observe(cv); resize(c);
+  const cv = el.querySelector('canvas.bg'), fcv = el.querySelector('canvas.fx');
+  const c = cards[key] = { el, cv, fcv, fg: el.querySelector('.fg'), bctx: cv.getContext('2d'), ctx: fcv.getContext('2d'), seed: key.charCodeAt(0) * 97 + key.charCodeAt(1) };
+  if (window.ResizeObserver) new ResizeObserver(() => resize(c)).observe(cv); else addEventListener('resize', () => resize(c));
+  if (window.IntersectionObserver) new IntersectionObserver(es => { c.vis = es[0].isIntersecting; need = true; kick(); }).observe(cv);
+  resize(c);
   return c;
 }
 
@@ -332,7 +376,7 @@ const catHtml = c => '<span class="tg" style="' + (c === 'LIFR' ? 'background:#2
 
 function spark(v, col) {
   v = v.filter(x => typeof x === 'number');
-  if (v.length < 2) return '<small style="color:#828282">資料累積中</small>';
+  if (v.length < 2) return '<small style="color:#595959">資料累積中</small>';
   const mn = Math.min(...v), mx = Math.max(...v), r = mx - mn || 1;
   const p = v.map((y, i) => (i / (v.length - 1) * 200).toFixed(1) + ',' + (28 - (y - mn) / r * 26).toFixed(1)).join(' ');
   return '<div class="sp"><svg viewBox="0 0 200 30" width="100%" height="34" preserveAspectRatio="none"><polyline points="' + p +
@@ -360,17 +404,21 @@ function dial(s, r) {
   }
   return '<svg width="96" height="96" viewBox="-48 -48 96 96"><circle r="44" fill="#fff" stroke="#e8e8e8"/>' + sec +
     '<line y1="-34" y2="34" stroke="#816729" stroke-width="5" opacity=".35" transform="rotate(' + r.e[1] + ')"/>' + arrow +
-    '<text y="-33" font-size="9" text-anchor="middle" fill="#828282">N</text>' +
-    '<text y="4" font-size="14" text-anchor="middle" fill="#202020">' + (s.vrb ? 'VRB' : s.spd) + '</text><text y="15" font-size="8" text-anchor="middle" fill="#828282">kt</text></svg>';
+    '<text y="-33" font-size="9" text-anchor="middle" fill="#595959">N</text>' +
+    '<text y="4" font-size="14" text-anchor="middle" fill="#202020">' + (s.vrb ? 'VRB' : s.spd) + '</text><text y="15" font-size="8" text-anchor="middle" fill="#595959">kt</text></svg>';
 }
 
 function upsert(key, d, h) {
-  const m = META[key], c = ensure(key), s = c.s = derive(d, m), r = rwy(key, s);
+  const m = META[key], c = ensure(key), s = derive(d, m), r = rwy(key, s);
+  const age = d.obsTime ? Math.max(0, Math.round((Date.now() / 1000 - d.obsTime) / 60)) : null;
+  const sg = JSON.stringify([d.raw, d.obsTime, d.wxString, d.decoded, d.fltCat, h ? h.length : 0, !!(d.isSpeci && age != null && age <= 90)]);
+  if (c.sg === sg) return false;                       // 資料沒變：不重畫，動畫也不會跳
+  c.sg = sg; c.s = s; c.dirty = true;
   c.land = Math.sin(r.e[1] * Math.PI / 180) >= 0 ? -1 : 1;
   c.el.id = 'c-' + key;
-  build(c);
+  const ss = JSON.stringify([s.layers, s.rain, s.snow, s.ts, s.cb]);
+  if (c.ss !== ss) { c.ss = ss; build(c); }          // 天氣場景沒變就沿用原本的雲與雨
   const comp = ['北', '北北東', '東北', '東北東', '東', '東南東', '東南', '南南東', '南', '南南西', '西南', '西南西', '西', '西北西', '西北', '北北西'];
-  const age = d.obsTime ? Math.max(0, Math.round((Date.now() / 1000 - d.obsTime) / 60)) : null;
   const visT = s.vkm >= 10 ? '10 km 以上' : s.vkm.toFixed(1) + ' km';
   const ceilT = isFinite(s.ceil) ? s.ceil.toLocaleString() + ' ft' : '無';
   const al = [];
@@ -388,6 +436,8 @@ function upsert(key, d, h) {
     (s.ws.length ? '；風切：' + s.ws.join('、') : '');
   const rwT = r.calm ? '風小或風向不定，不計算順逆風' : '逆風最大：跑道 ' + r.e[0] + '，逆風 ' + Math.round(r.hw) + ' kt、' +
     (r.xw > 0 ? '右' : '左') + '側風 ' + Math.round(Math.abs(r.xw)) + ' kt' + (s.gst > s.spd ? '（陣風時側風 ' + Math.round(r.gx) + ' kt）' : '');
+  c.cv.setAttribute('role', 'img');
+  c.cv.setAttribute('aria-label', (d.name || m[1]) + '：' + (d.fltCat || '') + (al.length ? '，注意：' + al.join('、') : '') + (tg.length ? '，' + tg.join('、') : '') + '，' + windT + '，能見度 ' + visT + '，雲幕 ' + ceilT);
   c.el.classList.toggle('alert', al.length > 0);
   c.el.querySelector('.nm').innerHTML = esc(d.name || m[1]) + '<small>' + (d.icao || m[0]) + ' / ' + key + '</small>';
   c.el.querySelector('.cat').innerHTML = catHtml(d.fltCat || '—');
@@ -395,7 +445,7 @@ function upsert(key, d, h) {
   c.el.querySelector('.info').innerHTML =
     '<div class="f wd">' + dial(s, r) + '<div><b>風</b>' + windT + '<br><span style="color:#4d4d4d">' + rwT + '</span></div></div>' +
     '<div class="f mini"><div><b>能見度</b>' + visT + '</div><div><b>雲幕</b>' + ceilT + '</div><div><b>氣溫／露點</b>' + d.temp + '° / ' + d.dewp + '°</div></div>' +
-    '<div class="f"><b>觀測（台北時間）</b>' + (d.obsTime ? dm(d.obsTime * 1000) + '，' + age + ' 分鐘前' : '—') + '</div>' +
+    '<div class="f"><b>觀測（台北時間）</b>' + (d.obsTime ? dm(d.obsTime * 1000) + '，<span class="ago" data-o="' + d.obsTime + '">' + age + ' 分鐘前</span>' : '—') + '</div>' +
     '<details class="f"><summary>更多資料</summary><div class="more">' +
     '<div><b>雲</b>' + (s.layers.length ? s.layers.map(l => l.cover + ' ' + l.base.toLocaleString() + ' ft').join('、') : '無雲／CAVOK') + '</div>' +
     '<div><b>氣壓</b>' + d.altim + ' hPa</div>' +
@@ -406,15 +456,23 @@ function upsert(key, d, h) {
   sm[key] = { k: key, name: d.name || m[1], cat: catHtml(d.fltCat || '—'), al,
     wind: (s.vrb ? 'VRB' : s.dir + '°') + ' ' + s.spd + ' kt' + (s.gst ? ' G' + s.gst : ''), vis: visT, ceil: ceilT,
     sev: (RANK[d.fltCat] || 0) * 2 + al.length };
+  need = true; kick();
+  return true;
+}
+
+function renderChips() {
+  document.getElementById('chips').innerHTML = Object.keys(META).filter(k => sm[k]).map(k => {
+    const o = sm[k];
+    return '<a class="chip' + (o.al.length ? ' a' : '') + '" href="#c-' + k + '">' + k + ' ' + o.cat.replace(/<[^>]+>/g, '') + (o.al.length ? ' •' : '') + '</a>';
+  }).join('');
 }
 
 function renderSummary() {
   const rows = Object.keys(sm).map(k => sm[k]).sort((a, b) => b.sev - a.sev);
   document.getElementById('sum').innerHTML = '<h2>' + rows.length + ' 個機場一覽（狀況較差的排前面）</h2>' +
     '<div class="sr h"><span>機場</span><span>類別</span><span>風</span><span>能見度</span><span>雲幕</span><span>注意</span></div>' +
-    rows.map(o => '<div class="sr" onclick="document.getElementById(\'c-' + o.k + '\').scrollIntoView({behavior:\'smooth\'})"><span><b>' + esc(o.name) +
-      '</b><small>' + o.k + '</small></span><span>' + o.cat + '</span><span>' + o.wind + '</span><span>' + o.vis + '</span><span>' + o.ceil + '</span><span>' +
-      (o.al.length ? '<span style="color:#ff682c">' + o.al.join('、') + '</span>' : '<span style="color:#828282">無</span>') + '</span></div>').join('');
+    rows.map(o => '<a class="sr" href="#c-' + o.k + '"><span><b>' + esc(o.name) + '</b><small>' + o.k + '</small></span><span>' + o.cat + '</span><span>' + o.wind +
+      '</span><span>' + o.vis + '</span><span>' + o.ceil + '</span><span>' + (o.al.length ? '<span class="al">' + o.al.join('、') + '</span>' : '<span class="no">無</span>') + '</span></a>').join('');
 }
 
 // ---------- 資料 ----------
@@ -433,44 +491,142 @@ function render() {
     src = demo('sunny');
   }
   if (!src || !src.airports) return;
-  for (const k in META) if (src.airports[k]) upsert(k, src.airports[k], src.history && src.history[k]);
-  renderSummary();
+  const H = mode === 'live' ? hist : null;
+  let ch = false;
+  for (const k in META) if (src.airports[k]) ch = upsert(k, src.airports[k], H && H[k]) || ch;
+  if (ch) { renderSummary(); renderChips(); }
   const miss = Object.keys(META).filter(k => !src.airports[k]);
   if (mode === 'live' && API.indexOf('http') === 0 && miss.length) {
     msg.style.display = 'block';
     msg.textContent = '快照裡沒有 ' + miss.join('、') + ' 的資料：請確認 GAS 已貼上最新版並用「新版本」重新部署，或等下一輪抓取。';
   }
-  const age = Math.round((Date.now() - src.updated) / 60000);
-  document.getElementById('st').textContent = mode === 'live' ? '快照 ' + hm(src.updated) + '（' + age + ' 分鐘前）' + (src.status && src.status.fails ? '　抓取失敗 ' + src.status.fails + ' 次：' + src.status.failReason : '') : '示範情境';
-  bar.classList.toggle('old', mode === 'live' && age > 15);
+  stSrc = src; paintStatus();
 }
 
-async function load() {
-  if (API.indexOf('http') !== 0) { render(); return; }
+async function get(q) {
+  const ac = window.AbortController ? new AbortController() : null, to = ac && setTimeout(() => ac.abort(), 20000);
   try {
-    const res = await fetch(API + '?history=24');
-    snap = await res.json();
+    const res = await fetch(API + q, ac ? { signal: ac.signal } : {});
+    if (!res.ok) throw new Error(res.status);
+    return await res.json();
+  } finally { if (to) clearTimeout(to); }
+}
+const sigOf = d => Object.keys(d.airports || {}).map(k => k + d.airports[k].obsTime + d.airports[k].raw).join('|');
+function schedule(ms) { clearTimeout(timer); timer = setTimeout(load, ms); }
+
+async function load(force) {
+  if (API.indexOf('http') !== 0) { render(); return; }
+  if (document.hidden && !force) { pending = true; return; }      // 背景分頁不抓，回到前景再補
+  clearTimeout(timer); pending = false;
+  try {
+    let d = await get('');                                         // 平常只抓最新快照（很小）
+    const s2 = sigOf(d);
+    if (!hist || s2 !== sig) {                                     // 第一次或出現新報，才多抓 24 小時歷史
+      try { const h = await get('?history=24'); d = h; hist = h.history || hist; } catch (e) { /* 歷史失敗不影響最新資料 */ }
+    }
+    sig = s2; snap = d; fails = 0;
     document.getElementById('msg').style.display = 'none';
+    const lo = d.status && d.status.lastFetchOk || 0;              // GAS 最近一次成功抓取的時間，推算下一次更新
+    if (lastOk && lo > lastOk && lo - lastOk <= 960000) est = Math.round((est + Math.max(120000, lo - lastOk)) / 2);
+    if (lo) lastOk = lo;
+    let wait = lo ? lo + est + 20000 - Date.now() : est;
+    late = wait > 0 ? 0 : late + 1;
+    if (wait <= 0) wait = Math.min(30000 * Math.pow(2, late - 1), 120000);   // 預期的更新還沒到：短暫重試再退避
+    schedule(wait + Math.random() * 45000);                        // 加隨機延遲，避免多人同一秒一起讀
   } catch (e) {
+    fails++;
     const m = document.getElementById('msg');
     m.style.display = 'block'; m.textContent = '讀取失敗，顯示上一次的資料。請確認 /exec 網址與部署權限（存取權要選「所有人」）。';
+    schedule(Math.min(30000 * Math.pow(2, fails - 1), 300000));
   }
   render();
+}
+
+function paintStatus() {
+  const src = stSrc;
+  if (!src) return;
+  const age = Math.round((Date.now() - src.updated) / 60000);
+  document.getElementById('st').textContent = mode === 'live' ? '快照 ' + hm(src.updated) + '（' + age + ' 分鐘前）' +
+    (src.status && src.status.fails ? '　抓取失敗 ' + src.status.fails + ' 次：' + src.status.failReason : '') : '示範情境';
+  document.getElementById('bar').classList.toggle('old', mode === 'live' && age > 25);
+}
+// 不連網，只更新畫面上的「幾分鐘前」
+function tickAge() {
+  if (document.hidden) return;
+  document.querySelectorAll('.ago').forEach(e => { e.textContent = Math.max(0, Math.round((Date.now() / 1000 - Number(e.dataset.o)) / 60)) + ' 分鐘前'; });
+  paintStatus(); refreshSun();
 }
 
 const sel = document.getElementById('mode');
 sel.innerHTML = '<option value="live">即時資料</option>' + Object.keys(PRE).map(k => '<option value="' + k + '">預覽：' + PRE[k][0] + '</option>').join('');
 sel.onchange = () => { mode = sel.value; render(); };
 
-let last = performance.now();
-(function loop(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  for (const k in cards) if (cards[k].s && cards[k].W) draw(cards[k], now / 1000, dt);
-  requestAnimationFrame(loop);
-})(last);
+// ---------- 動畫與省電 ----------
+// 自動：沒下雨 12 fps、下雨或雷暴 24 fps；3 分鐘沒操作降到 6 fps，20 分鐘沒操作停止動畫。
+// 省電：只畫靜態畫面。完整：固定 30 fps。系統設定「減少動態效果」、資料節省、電量 20% 以下（不在充電）時，自動模式會改成省電。
+let pref = 'auto', autoEco = false, lowBat = false, lastAct = Date.now(), running = false, need = true, loopT = null, last = 0;
+try { pref = localStorage.getItem('pm') || 'auto'; } catch (e) { /* 無痕模式等情況讀不到就用預設 */ }
+const PMN = { auto: '動畫：自動', eco: '動畫：省電', full: '動畫：完整' };
+const powerMode = () => pref === 'auto' && autoEco ? 'eco' : pref;
+const idleMs = () => Date.now() - lastAct;
+function paintPw() { document.getElementById('pw').textContent = PMN[pref] + (pref === 'auto' && autoEco ? '（省電中）' : ''); }
+function checkEco() {
+  autoEco = !!((window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || (navigator.connection && navigator.connection.saveData) || lowBat);
+  paintPw(); need = true; kick();
+}
+function wet() { for (const k in cards) { const c = cards[k]; if (c.s && c.vis !== false && (c.s.rain || c.s.snow || c.s.ts)) return true; } return false; }
+function anyVis() { for (const k in cards) if (cards[k].s && cards[k].W && cards[k].vis !== false) return true; return false; }
+function targetFps() {
+  const m = powerMode();
+  if (m === 'eco') return 0;
+  if (m === 'full') return 30;
+  const idle = idleMs();
+  if (idle > 20 * 60e3) return 0;
+  return Math.min(wet() ? 24 : 12, idle > 3 * 60e3 ? 6 : 99);
+}
+function frame() {
+  loopT = null;
+  const fps = targetFps();
+  if (document.hidden || !anyVis() || (!fps && !need)) { running = false; return; }   // 背景、畫面外、靜態：不排任何計時器
+  requestAnimationFrame(now => {
+    const dt = fps ? Math.min(.25, (now - last) / 1000) : 0; last = now;
+    for (const k in cards) if (cards[k].s && cards[k].W && cards[k].vis !== false) draw(cards[k], now / 1000, dt);
+    need = false;
+    if (fps) loopT = setTimeout(frame, 1000 / fps); else running = false;
+  });
+}
+function kick() { if (running || document.hidden) return; running = true; last = performance.now(); frame(); }
+function refreshSun() {            // 太陽位置每分鐘校正一次，變動夠大才重畫靜態背景
+  if (mode !== 'live') return;
+  for (const k in cards) {
+    const c = cards[k]; if (!c.s) continue;
+    const m = META[k], sn = sun(m[2], m[3]);
+    if (Math.abs(sn.e - c.s.e) > .4) { c.s.e = sn.e; c.s.ha = sn.ha; c.dirty = true; need = true; kick(); }
+  }
+}
+['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(t => addEventListener(t, () => {
+  const was = idleMs() > 3 * 60e3; lastAct = Date.now(); if (was) { need = true; kick(); }
+}, { passive: true, capture: true }));
+document.getElementById('pw').onclick = () => {
+  pref = pref === 'auto' ? 'eco' : pref === 'eco' ? 'full' : 'auto';
+  try { localStorage.setItem('pm', pref); } catch (e) { /* 存不了就只在這次有效 */ }
+  paintPw(); need = true; kick();
+};
+if (navigator.getBattery) navigator.getBattery().then(b => {
+  const f = () => { lowBat = !b.charging && b.level <= .2; checkEco(); };
+  f(); b.addEventListener('levelchange', f); b.addEventListener('chargingchange', f);
+}).catch(() => {});
+checkEco();
 
-document.getElementById('rf').onclick = load;
-load(); setInterval(load, 60000);
+document.getElementById('rf').onclick = () => load(true);
+load(); setInterval(tickAge, 60000);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { clearTimeout(timer); clearTimeout(loopT); loopT = null; running = false; return; }   // 背景時連計時器也停掉
+  need = true; kick(); refreshSun();
+  if (!snap || pending || !lastOk || Date.now() > lastOk + est + 20000) load();
+  else { schedule(Math.max(5000, lastOk + est + 20000 - Date.now())); tickAge(); }
+});
+addEventListener('pageshow', e => { if (e.persisted) load(); });
 </script>
 </body>
 </html>
