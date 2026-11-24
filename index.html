@@ -3,50 +3,88 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <title>機場天氣場景</title>
 <style>
-:root{--bg:#0f1826;--card:#16233a;--line:#26385a;--tx:#e9eff9;--mute:#8da0bf}
+:root{--g:#202020;--w:#fff;--ash:#efefef;--fog:#f5f5f5;--steel:#4d4d4d;--slate:#828282;--mist:#e8e8e8;--ember:#ff682c;--brass:#816729;
+--head:"Inter Tight","Space Grotesk","Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--body:"Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.55 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
-header{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;justify-content:space-between;padding:16px 18px 4px}
-h1{font-size:19px;font-weight:600;margin:0}
-.bar{display:flex;gap:12px;align-items:center;color:var(--mute);font-size:13px}
-.bar.old #st{color:#ffb454}
-select{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:inherit}
-#msg{display:none;margin:8px 18px 0;padding:8px 12px;border-radius:6px;background:#3b2c12;color:#ffd596;font-size:13px}
-main{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px;padding:14px 18px 30px}
-.card{background:var(--card);border-radius:10px;overflow:hidden}
+body{margin:0;background:var(--w);color:var(--g);font:400 15px/1.5 var(--body)}
+nav{max-width:1200px;margin:0 auto;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.logo,h1,.btn,.nm,.tg,.widget h2,.sr b,.cat,summary{font-family:var(--head);font-weight:400;letter-spacing:-.02em}
+.logo{font-size:20px}
+.pill{background:var(--ash);border-radius:200px;padding:8px 18px;font:400 13px var(--head);letter-spacing:-.02em;color:var(--steel)}
+.old #st{color:var(--ember)}
+.hero{max-width:1200px;margin:0 auto;padding:60px 24px 80px}
+.cap{margin:0 0 20px;font:400 13px var(--head);letter-spacing:-.02em;color:var(--brass)}
+h1{margin:0 0 20px;font-size:clamp(44px,8vw,66px);line-height:.91}
+.sub{margin:0 0 36px;max-width:560px;font-size:18px;line-height:1.25;color:var(--steel)}
+.btn{font-size:16px;line-height:1;padding:10px 20px;border-radius:0;border:1px solid var(--g);background:transparent;color:var(--g);cursor:pointer;margin:0 8px 8px 0}
+.btn.p{background:var(--g);color:var(--w)}
+.btn:focus-visible,summary:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+#msg{display:none;width:calc(100% - 48px);max-width:1152px;margin:0 auto 20px;padding:12px 16px;border-left:2px solid var(--ember);background:var(--fog);color:var(--steel);font-size:14px}
+.band{background:var(--ash);padding:64px 0}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.widget{background:var(--w);border-radius:20px;padding:32px 40px;overflow-x:auto}
+.widget h2{margin:0 0 20px;font-size:18px;line-height:1.25}
+.sr{display:grid;grid-template-columns:minmax(110px,1.1fr) 80px 1.4fr 1fr 1fr 1.6fr;gap:12px 20px;align-items:center;padding:14px 0;border-top:1px solid var(--mist);min-width:640px;cursor:pointer}
+.sr.h{border:0;padding:0 0 8px;color:var(--slate);font-size:12px;cursor:default}
+.sr b{font-size:18px}
+.sr small{display:block;color:var(--slate);font-size:12px}
+.tg{display:inline-block;padding:0 12px;border:1px solid;border-radius:20px;font-size:13px;background:var(--w)}
+main{max-width:1200px;margin:0 auto;padding:12px 24px 64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px}
+.card{background:var(--ash);border-radius:6px 0 0 0;overflow:hidden;scroll-margin-top:20px}
+.card.alert{outline:1px solid var(--ember);outline-offset:-1px}
 .sc{position:relative}
-canvas{display:block;width:100%;height:240px}
-.tag{position:absolute;top:10px;left:14px;font-size:17px;font-weight:600;text-shadow:0 1px 5px #0008}
-.tag small{display:block;font-size:12px;font-weight:400;opacity:.85}
-.cat{position:absolute;top:12px;right:14px;padding:1px 10px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
-.bd{position:absolute;left:14px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
-.bd span{background:#000a;border-radius:5px;padding:0 8px;font-size:12px}
-.info{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:14px}
-.info b{display:block;color:var(--mute);font-weight:400;font-size:12px}
+canvas{display:block;width:100%;height:210px}
+.nm{position:absolute;top:16px;left:16px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.88);font-size:22px;line-height:1.1}
+.nm small{display:block;font:400 12px var(--body);letter-spacing:0;color:var(--steel)}
+.cat{position:absolute;top:16px;right:16px}
+.bd{position:absolute;left:16px;bottom:12px;display:flex;gap:6px;flex-wrap:wrap}
+.bd span{background:rgba(255,255,255,.9);border-radius:20px;padding:0 10px;font-size:12px}
+.bd .a{color:var(--ember)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px}
+.info b{display:block;margin-bottom:2px;font:500 12px var(--body);color:var(--slate)}
 .f{grid-column:1/-1}
-.raw{color:var(--mute);font-size:11px;word-break:break-all;border-top:1px solid var(--line);padding-top:8px}
-.ar{display:inline-block;margin-right:4px;color:#7cc4ff}
-@media(prefers-reduced-motion:reduce){canvas{opacity:.95}}
+.wd{display:flex;gap:16px;align-items:center}
+.wd svg{flex:none}
+.raw{font-size:12px;color:var(--slate);word-break:break-all;border-top:1px solid var(--mist);padding-top:12px}
+.sp small{display:block;font-size:12px;color:var(--slate)}
+summary{display:inline-block;list-style:none;cursor:pointer;font-size:14px;padding:8px 16px;border:1px solid var(--g)}
+summary::-webkit-details-marker{display:none}
+.dec{white-space:pre-wrap;font:400 13px/1.7 var(--body);margin:8px 0 0;padding:16px;background:var(--w);border-radius:6px 0 0 0;color:var(--steel)}
+.nr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+nav .btn{font-size:14px;padding:8px 14px;margin:0}
+.mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:14px}
+.more{display:grid;gap:14px;margin-top:12px}
+.more .dec{margin:4px 0 0}
+footer{background:var(--ash);padding:60px 0}
+footer p{max-width:1200px;margin:0 auto;padding:0 24px;font-size:14px;line-height:1.5;color:var(--steel)}
 </style>
 </head>
 <body>
-<header>
-  <h1>機場天氣場景</h1>
-  <div class="bar" id="bar"><span id="st">載入中…</span>
-    <select id="mode" aria-label="預覽情境"></select></div>
-</header>
+<nav>
+  <span class="logo">METAR 機場天氣</span>
+  <div class="nr">
+    <div class="pill" id="bar"><span id="st">載入中…</span></div>
+    <button class="btn p" id="rf">重新整理</button>
+    <select class="btn" id="mode" aria-label="預覽情境"></select>
+  </div>
+</nav>
 <div id="msg"></div>
 <main id="main"></main>
+<section class="band"><div class="wrap"><div class="widget" id="sum"></div></div></section>
+<footer><p>場景朝南看：左側是東、右側是西。順逆風與側風以 METAR 風向（真北）對照跑道真方位計算，只是參考，不等於各機型的作業限制；側風 20 kt 以上會標示注意。跑道取自公開資料：松山 10/28、桃園 05/23、虹橋 18/36、浦東 16/17 與 34/35。METAR 沒有颱風欄位，強風與暴風標籤只依風速判斷。</p></footer>
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbw2nt_3kBe7CtRSq7YItqpalquu2rsvqP8f5TR6jUjSiu9IKvp7d3gzSIqncKZ6uKGL/exec';
+const API = '貼上你的 GAS /exec 網址';
 const META = {
   TSA: ['RCSS', '松山', 25.0697, 121.5522],
+  TPE: ['RCTP', '桃園', 25.0777, 121.2328],
   SHA: ['ZSSS', '上海虹橋', 31.1979, 121.3363],
   PVG: ['ZSPD', '上海浦東', 31.1443, 121.8083]
 };
-const CATC = { VFR: '#2e9e5b', MVFR: '#2f6fd6', IFR: '#d9382f', LIFR: '#b0309b' };
+const CATC = { VFR: '#202020', MVFR: '#816729', IFR: '#ff682c', LIFR: '#202020' };
 const COV = { FEW: .2, SCT: .45, BKN: .75, OVC: 1, OVX: 1, VV: 1 };
 const PRE = {
   sunny: ['晴朗大太陽', { raw: '（示範）18008KT CAVOK 35/22 Q1008', temp: 35, dewp: 22, altim: 1008, wdir: 180, wspd: 8, visib: '6+', clouds: [], wxString: '', fltCat: 'VFR', elev: 60 }],
@@ -101,6 +139,9 @@ function derive(d, m) {
   s.cb = s.ts || /CB|TCU/.test(d.raw || '');
   s.spd = Number(d.wspd) || 0; s.gst = Number(d.wgst) || 0;
   s.vrb = d.wdir === 'VRB'; s.dir = Number(d.wdir) || 0;
+  const vr = /(?:^|\s)(\d{3})V(\d{3})(?:\s|$)/.exec(d.raw || ''); s.vr = vr ? [+vr[1], +vr[2]] : null;
+  s.ws = []; const wsRaw = String(d.raw || '').split(/\sRMK\s/)[0], wsRe = /(?:^|\s)WS\s+(?:(ALL)\s+RWY|R(?:WY)?(\d{2}[LCR]?))(?=\s|$)/g; let w;
+  while ((w = wsRe.exec(wsRaw))) s.ws.push(w[1] ? '全部跑道' : '跑道 ' + w[2]);
   s.temp = d.temp;
   const sn = sun(m[2], m[3]);
   s.e = d.elev != null ? d.elev : sn.e; s.ha = d.elev != null ? 0 : sn.ha;
@@ -124,9 +165,9 @@ function build(c) {
     }
   });
   const kind = s.snow ? s.snow : s.rain, n = s.snow ? [0, 25, 55, 100][kind] : [0, 45, 100, 180][kind];
-  c.drops = Array.from({ length: n * (c.W / 420) | 0 }, () => ({ x: r() * c.W, y: r() * c.H, l: .7 + r() * .6 }));
+  c.drops = Array.from({ length: n * (c.W / 420) | 0 }, () => ({ x: r() * c.W, y: r() * c.H, l: .7 + r() * .6, gy: HY + 6 + r() * (c.H - HY - 10) }));
   c.stars = Array.from({ length: 40 }, () => ({ x: r() * c.W, y: r() * HY * .8, p: r() * 6 }));
-  c.nextF = 1 + r() * 3; c.flash = 0; c.bolt = null;
+  c.nextF = 1 + r() * 3; c.flash = 0; c.bolt = null; c.sp = [];
 }
 
 function skyCols(e) {
@@ -167,15 +208,23 @@ function draw(c, t, dt) {
     ctx.fillStyle = 'rgba(235,238,245,' + (.15 + .85 * vis) + ')'; ctx.beginPath(); ctx.arc(W * .78, H * .2, 10 * k, 0, 7); ctx.fill();
   }
 
+  if (e > -4 && e < 14) {
+    const ga = (1 - Math.abs(e - 3) / 11) * (1 - s.cc * .6) * .5, gx = W * (.5 + cl(s.ha / 120, -.42, .42));
+    const gl = ctx.createRadialGradient(gx, HY, 0, gx, HY, W * .6);
+    gl.addColorStop(0, 'rgba(255,104,44,' + ga + ')'); gl.addColorStop(1, 'rgba(255,104,44,0)');
+    ctx.fillStyle = gl; ctx.fillRect(0, 0, W, HY);
+  }
   // 雲
   const lc = mix([70, 78, 98], [250, 251, 253], df), storm = cl(s.rain / 4 + (s.ts ? .5 : 0) + (s.ceil < 2500 ? .25 : 0) + (s.cb ? .3 : 0), 0, 1);
-  ctx.fillStyle = rgba(mix(lc, mix([60, 64, 74], [110, 114, 124], df), storm), .93);
+  const cc0 = mix(lc, mix([60, 64, 74], [110, 114, 124], df), storm);
   c.clouds.forEach(o => {
     o.x += dx * (6 + spd * 2.4) * k * o.sf * dt / W;
     if (o.x > 1.15) o.x = -.15; if (o.x < -.15) o.x = 1.15;
-    ctx.beginPath();
-    o.b.forEach(b => { const px = o.x * W + b[0] * k, py = o.y + b[1] * k; ctx.moveTo(px + b[2] * k, py); ctx.arc(px, py, b[2] * k, 0, 7); });
-    ctx.fill();
+    [[5, mix(cc0, [0, 0, 0], .14), .9], [0, cc0, .93]].forEach(q => {
+      ctx.fillStyle = rgba(q[1], q[2]); ctx.beginPath();
+      o.b.forEach(b => { const px = o.x * W + b[0] * k, py = o.y + (b[1] + q[0]) * k; ctx.moveTo(px + b[2] * k, py); ctx.arc(px, py, b[2] * k, 0, 7); });
+      ctx.fill();
+    });
   });
 
   // 地面、跑道、塔台
@@ -186,6 +235,29 @@ function draw(c, t, dt) {
   for (let x = 6; x < W; x += 34 * k) ctx.fillRect(x, ry + rh / 2 - 1, 16 * k, 2);
   ctx.fillStyle = rgba(mix([14, 18, 28], [72, 78, 92], df));
   ctx.fillRect(W * .1, HY - 26 * k, 7 * k, 26 * k); ctx.fillRect(W * .1 - 5 * k, HY - 34 * k, 17 * k, 9 * k);
+
+  // 航廈、樹、跑道燈、起降的飛機
+  const dk = rgba(mix([14, 18, 28], [72, 78, 92], df));
+  ctx.fillStyle = dk; ctx.fillRect(W * .2, HY - 10 * k, W * .24, 10 * k);
+  const lean = dx * Math.min(spd, 30) / 30 * 9 * k;
+  [.52, .58, .66].forEach((fx, i) => {
+    const bx = W * fx, sw = lean + Math.sin(t * 2 + i) * Math.min(spd, 30) / 30 * 2.5 * k;
+    ctx.strokeStyle = dk; ctx.lineWidth = 2 * k; ctx.beginPath(); ctx.moveTo(bx, HY + 4 * k); ctx.lineTo(bx + sw * .5, HY - 14 * k); ctx.stroke();
+    ctx.fillStyle = rgba(mix([30, 40, 34], [92, 110, 84], df)); ctx.beginPath(); ctx.arc(bx + sw, HY - 18 * k, 8 * k, 0, 7); ctx.fill();
+  });
+  if (e < 4) {
+    ctx.fillStyle = 'rgba(255,205,120,' + cl((4 - e) / 8, 0, 1) + ')';
+    for (let x = 8; x < W; x += 16 * k) { ctx.fillRect(x, ry - 1, 2 * k, 2 * k); ctx.fillRect(x, ry + rh - 1, 2 * k, 2 * k); }
+  }
+  if (c.land) {
+    const pr = ((t + c.seed % 7) % 16) / 16, gy = ry + rh * .5, y0 = HY - 70 * k, fl = pr < .4;
+    const sx = c.land > 0 ? -.1 : 1.1, ex = c.land > 0 ? 1.1 : -.1, sc = k * (.8 + .5 * (fl ? pr / .4 : 1));
+    ctx.save(); ctx.translate(W * (sx + (ex - sx) * pr), (fl ? y0 + (gy - y0) * pr / .4 : gy) - 3 * sc);
+    ctx.scale(c.land, 1); ctx.globalAlpha = cl(s.vkm / 6, .3, 1); ctx.fillStyle = dk;
+    ctx.beginPath(); ctx.ellipse(0, 0, 14 * sc, 2.8 * sc, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-2 * sc, 0); ctx.lineTo(-8 * sc, 9 * sc); ctx.lineTo(-4 * sc, 9 * sc); ctx.lineTo(5 * sc, 0); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-12 * sc, -sc); ctx.lineTo(-15 * sc, -7 * sc); ctx.lineTo(-11 * sc, -sc); ctx.fill(); ctx.restore();
+  }
 
   // 風向袋
   const px = W * .9, py = HY + (H - HY) * .22, len = 34 * k, sg = dx >= 0 ? 1 : -1;
@@ -207,12 +279,15 @@ function draw(c, t, dt) {
     if (s.snow) ctx.fillStyle = 'rgba(255,255,255,.85)'; else { ctx.strokeStyle = 'rgba(195,215,240,.55)'; ctx.lineWidth = Math.max(1, k); ctx.beginPath(); }
     c.drops.forEach((o, i) => {
       o.x += (vx + (s.snow ? Math.sin(t + i) * 10 : 0)) * o.l * dt; o.y += vy * o.l * dt;
-      if (o.y > H) { o.y = -10; o.x = Math.random() * W; }
+      if (o.y > (o.gy || H)) { if (!s.snow && o.gy && c.sp.length < 40) c.sp.push({ x: o.x, y: o.gy, a: 0 }); o.y = -10; o.x = Math.random() * W; }
       if (o.x > W + 30) o.x -= W + 60; if (o.x < -30) o.x += W + 60;
       if (s.snow) { ctx.beginPath(); ctx.arc(o.x, o.y, 1.4 * k * o.l, 0, 7); ctx.fill(); }
       else { ctx.moveTo(o.x, o.y); ctx.lineTo(o.x - vx * .03 * o.l, o.y - vy * .03 * o.l); }
     });
     if (!s.snow) ctx.stroke();
+    c.sp = c.sp.filter(q => (q.a += dt * 3) < 1); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1;
+    c.sp.forEach(q => { ctx.globalAlpha = 1 - q.a; ctx.beginPath(); ctx.ellipse(q.x, q.y, 2 * k + q.a * 6 * k, (1 + q.a * 2) * k, 0, 0, 7); ctx.stroke(); });
+    ctx.globalAlpha = 1;
   }
 
   // 閃電
@@ -242,7 +317,7 @@ function resize(c) {
 function ensure(key) {
   if (cards[key]) return cards[key];
   const el = document.createElement('section'); el.className = 'card';
-  el.innerHTML = '<div class="sc"><canvas></canvas><div class="tag"></div><div class="cat"></div><div class="bd"></div></div><div class="info"></div>';
+  el.innerHTML = '<div class="sc"><canvas></canvas><div class="nm"></div><div class="cat"></div><div class="bd"></div></div><div class="info"></div>';
   document.getElementById('main').appendChild(el);
   const cv = el.querySelector('canvas');
   const c = cards[key] = { el, cv, ctx: cv.getContext('2d'), seed: key.charCodeAt(0) * 97 + key.charCodeAt(1) };
@@ -250,31 +325,96 @@ function ensure(key) {
   return c;
 }
 
-function upsert(key, d) {
-  const m = META[key], c = ensure(key), s = c.s = derive(d, m);
+const RWY = { TSA: [['10', 92], ['28', 272]], TPE: [['05L/R', 49], ['23L/R', 229]], SHA: [['18', 176], ['36', 356]], PVG: [['16/17', 162], ['34/35', 342]] };
+const RANK = { VFR: 0, MVFR: 1, IFR: 2, LIFR: 3 };
+const sm = {};
+const catHtml = c => '<span class="tg" style="' + (c === 'LIFR' ? 'background:#202020;color:#fff;border-color:#202020' : 'color:' + (CATC[c] || '#4d4d4d')) + '">' + c + '</span>';
+
+function spark(v, col) {
+  v = v.filter(x => typeof x === 'number');
+  if (v.length < 2) return '<small style="color:#828282">資料累積中</small>';
+  const mn = Math.min(...v), mx = Math.max(...v), r = mx - mn || 1;
+  const p = v.map((y, i) => (i / (v.length - 1) * 200).toFixed(1) + ',' + (28 - (y - mn) / r * 26).toFixed(1)).join(' ');
+  return '<div class="sp"><svg viewBox="0 0 200 30" width="100%" height="34" preserveAspectRatio="none"><polyline points="' + p +
+    '" fill="none" stroke="' + col + '" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg><small>' + mn + ' ～ ' + mx + '（' + v.length + ' 筆）</small></div>';
+}
+
+// 逆風最大的跑道端；風小或風向不定時不計算
+function rwy(key, s) {
+  const R = RWY[key];
+  if (s.vrb || !s.spd) return { e: R[0], hw: 0, xw: 0, gx: 0, calm: true };
+  let best = null;
+  R.forEach(e => {
+    const a = (s.dir - e[1]) * Math.PI / 180, hw = s.spd * Math.cos(a);
+    if (!best || hw > best.hw) best = { e, hw, xw: s.spd * Math.sin(a), gx: Math.abs((s.gst || s.spd) * Math.sin(a)) };
+  });
+  return best;
+}
+
+function dial(s, r) {
+  const arrow = s.vrb || !s.spd ? '' : '<g transform="rotate(' + s.dir + ')"><path d="M0-40V-12M-5-20L0-12L5-20" fill="none" stroke="#ff682c" stroke-width="2.5"/></g>';
+  let sec = '';
+  if (s.vr && s.spd) {
+    const p = a => [(40 * Math.sin(a * Math.PI / 180)).toFixed(1), (-40 * Math.cos(a * Math.PI / 180)).toFixed(1)], a = p(s.vr[0]), b = p(s.vr[1]);
+    sec = '<path d="M0 0L' + a.join(' ') + 'A40 40 0 ' + (((s.vr[1] - s.vr[0] + 360) % 360) > 180 ? 1 : 0) + ' 1 ' + b.join(' ') + 'Z" fill="#ff682c" opacity=".14"/>';
+  }
+  return '<svg width="96" height="96" viewBox="-48 -48 96 96"><circle r="44" fill="#fff" stroke="#e8e8e8"/>' + sec +
+    '<line y1="-34" y2="34" stroke="#816729" stroke-width="5" opacity=".35" transform="rotate(' + r.e[1] + ')"/>' + arrow +
+    '<text y="-33" font-size="9" text-anchor="middle" fill="#828282">N</text>' +
+    '<text y="4" font-size="14" text-anchor="middle" fill="#202020">' + (s.vrb ? 'VRB' : s.spd) + '</text><text y="15" font-size="8" text-anchor="middle" fill="#828282">kt</text></svg>';
+}
+
+function upsert(key, d, h) {
+  const m = META[key], c = ensure(key), s = c.s = derive(d, m), r = rwy(key, s);
+  c.land = Math.sin(r.e[1] * Math.PI / 180) >= 0 ? -1 : 1;
+  c.el.id = 'c-' + key;
   build(c);
-  const comp = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
-  const wind = s.vrb ? '風向不定' : '<span class="ar" style="display:inline-block;transform:rotate(' + (s.dir + 180) + 'deg)">↑</span>' + comp[Math.round(s.dir / 45) % 8] + '風 ' + s.dir + '°';
+  const comp = ['北', '北北東', '東北', '東北東', '東', '東南東', '東南', '南南東', '南', '南南西', '西南', '西南西', '西', '西北西', '西北', '北北西'];
   const age = d.obsTime ? Math.max(0, Math.round((Date.now() / 1000 - d.obsTime) / 60)) : null;
   const visT = s.vkm >= 10 ? '10 km 以上' : s.vkm.toFixed(1) + ' km';
-  const cat = d.fltCat || '—';
-  c.el.querySelector('.tag').innerHTML = esc(d.name || m[1]) + '<small>' + (d.icao || m[0]) + ' · ' + key + '</small>';
-  const ce = c.el.querySelector('.cat'); ce.textContent = cat; ce.style.background = CATC[cat] || '#556';
-  const bd = [];
-  if (s.spd >= 34) bd.push('暴風 ' + s.spd + ' kt'); else if (s.spd >= 22 || s.gst >= 34) bd.push('強風');
-  if (s.ts) bd.push('雷暴'); else if (s.rain) bd.push(['', '小雨', '雨', '大雨'][s.rain]); if (s.snow) bd.push('雪');
-  if (s.wx.indexOf('FG') >= 0) bd.push('霧'); else if (/BR|FU/.test(s.wx)) bd.push('薄霧'); else if (/HZ/.test(s.wx)) bd.push('霾');
-  if (s.ceil < 1000) bd.push('低雲幕'); if (s.temp >= 33) bd.push('酷熱');
-  c.el.querySelector('.bd').innerHTML = bd.map(x => '<span>' + x + '</span>').join('');
+  const ceilT = isFinite(s.ceil) ? s.ceil.toLocaleString() + ' ft' : '無';
+  const al = [];
+  if (s.ws.length) al.push('風切'); if (s.ts) al.push('雷暴'); if (/FG/.test(s.wx)) al.push('霧');
+  if (s.ceil < 1000) al.push('低雲幕'); if (s.vkm < 4.8) al.push('低能見度');
+  if (s.spd >= 34) al.push('暴風'); else if (s.spd >= 22 || s.gst >= 34) al.push('強風');
+  if (r.gx >= 20) al.push('側風 ' + Math.round(r.gx) + ' kt');
+  if (d.isSpeci && (age == null || age <= 90)) al.push('SPECI');
+  const tg = [];
+  if (s.rain) tg.push(/DZ/.test(s.wx) && !/RA/.test(s.wx) ? '毛毛雨' : (/SH/.test(s.wx) ? ['', '小陣雨', '陣雨', '大陣雨'] : ['', '小雨', '雨', '大雨'])[s.rain]);
+  if (s.snow) tg.push('雪');
+  if (/BR|FU/.test(s.wx)) tg.push('薄霧'); else if (/HZ/.test(s.wx)) tg.push('霾'); if (s.temp >= 33) tg.push('酷熱');
+  const windT = (s.vrb ? '風向不定' : comp[Math.round(s.dir / 22.5) % 16] + '風 ' + String(s.dir).padStart(3, '0') + '°') + '，' + s.spd + ' kt' + (s.gst ? '，陣風 ' + s.gst + ' kt' : '') +
+    (s.vr ? '；風向在 ' + s.vr.map(x => String(x).padStart(3, '0')).join('°～') + '° 間變化' : '') +
+    (s.ws.length ? '；風切：' + s.ws.join('、') : '');
+  const rwT = r.calm ? '風小或風向不定，不計算順逆風' : '逆風最大：跑道 ' + r.e[0] + '，逆風 ' + Math.round(r.hw) + ' kt、' +
+    (r.xw > 0 ? '右' : '左') + '側風 ' + Math.round(Math.abs(r.xw)) + ' kt' + (s.gst > s.spd ? '（陣風時側風 ' + Math.round(r.gx) + ' kt）' : '');
+  c.el.classList.toggle('alert', al.length > 0);
+  c.el.querySelector('.nm').innerHTML = esc(d.name || m[1]) + '<small>' + (d.icao || m[0]) + ' / ' + key + '</small>';
+  c.el.querySelector('.cat').innerHTML = catHtml(d.fltCat || '—');
+  c.el.querySelector('.bd').innerHTML = al.map(x => '<span class="a">' + x + '</span>').concat(tg.map(x => '<span>' + x + '</span>')).join('');
   c.el.querySelector('.info').innerHTML =
-    '<div class="f"><b>風</b>' + wind + '　' + s.spd + ' kt' + (s.gst ? '，陣風 ' + s.gst + ' kt' : '') + '</div>' +
-    '<div><b>能見度</b>' + visT + '</div>' +
-    '<div><b>雲幕</b>' + (isFinite(s.ceil) ? s.ceil.toLocaleString() + ' ft' : '無') + '</div>' +
-    '<div class="f"><b>雲</b>' + (s.layers.length ? s.layers.map(l => l.cover + ' ' + l.base.toLocaleString() + ' ft').join('、') : '無雲／CAVOK') + '</div>' +
-    '<div><b>氣溫／露點</b>' + d.temp + '°C ／ ' + d.dewp + '°C</div>' +
-    '<div><b>氣壓</b>' + d.altim + ' hPa</div>' +
+    '<div class="f wd">' + dial(s, r) + '<div><b>風</b>' + windT + '<br><span style="color:#4d4d4d">' + rwT + '</span></div></div>' +
+    '<div class="f mini"><div><b>能見度</b>' + visT + '</div><div><b>雲幕</b>' + ceilT + '</div><div><b>氣溫／露點</b>' + d.temp + '° / ' + d.dewp + '°</div></div>' +
     '<div class="f"><b>觀測（台北時間）</b>' + (d.obsTime ? dm(d.obsTime * 1000) + '，' + age + ' 分鐘前' : '—') + '</div>' +
-    '<div class="f raw">' + esc(d.raw || '') + '</div>';
+    '<details class="f"><summary>更多資料</summary><div class="more">' +
+    '<div><b>雲</b>' + (s.layers.length ? s.layers.map(l => l.cover + ' ' + l.base.toLocaleString() + ' ft').join('、') : '無雲／CAVOK') + '</div>' +
+    '<div><b>氣壓</b>' + d.altim + ' hPa</div>' +
+    '<div><b>近 24 小時風速（kt）</b>' + spark((h || []).map(x => x.wspd), '#ff682c') + '</div>' +
+    '<div><b>近 24 小時氣溫（°C）</b>' + spark((h || []).map(x => x.temp), '#816729') + '</div>' +
+    '<div><b>中文解讀</b><pre class="dec">' + esc(d.decoded || '') + '</pre></div>' +
+    '<div class="raw">' + esc(d.raw || '') + '</div></div></details>';
+  sm[key] = { k: key, name: d.name || m[1], cat: catHtml(d.fltCat || '—'), al,
+    wind: (s.vrb ? 'VRB' : s.dir + '°') + ' ' + s.spd + ' kt' + (s.gst ? ' G' + s.gst : ''), vis: visT, ceil: ceilT,
+    sev: (RANK[d.fltCat] || 0) * 2 + al.length };
+}
+
+function renderSummary() {
+  const rows = Object.keys(sm).map(k => sm[k]).sort((a, b) => b.sev - a.sev);
+  document.getElementById('sum').innerHTML = '<h2>' + rows.length + ' 個機場一覽（狀況較差的排前面）</h2>' +
+    '<div class="sr h"><span>機場</span><span>類別</span><span>風</span><span>能見度</span><span>雲幕</span><span>注意</span></div>' +
+    rows.map(o => '<div class="sr" onclick="document.getElementById(\'c-' + o.k + '\').scrollIntoView({behavior:\'smooth\'})"><span><b>' + esc(o.name) +
+      '</b><small>' + o.k + '</small></span><span>' + o.cat + '</span><span>' + o.wind + '</span><span>' + o.vis + '</span><span>' + o.ceil + '</span><span>' +
+      (o.al.length ? '<span style="color:#ff682c">' + o.al.join('、') + '</span>' : '<span style="color:#828282">無</span>') + '</span></div>').join('');
 }
 
 // ---------- 資料 ----------
@@ -293,16 +433,22 @@ function render() {
     src = demo('sunny');
   }
   if (!src || !src.airports) return;
-  for (const k in META) if (src.airports[k]) upsert(k, src.airports[k]);
+  for (const k in META) if (src.airports[k]) upsert(k, src.airports[k], src.history && src.history[k]);
+  renderSummary();
+  const miss = Object.keys(META).filter(k => !src.airports[k]);
+  if (mode === 'live' && API.indexOf('http') === 0 && miss.length) {
+    msg.style.display = 'block';
+    msg.textContent = '快照裡沒有 ' + miss.join('、') + ' 的資料：請確認 GAS 已貼上最新版並用「新版本」重新部署，或等下一輪抓取。';
+  }
   const age = Math.round((Date.now() - src.updated) / 60000);
-  document.getElementById('st').textContent = mode === 'live' ? '快照 ' + hm(src.updated) + '（' + age + ' 分鐘前）' : '示範情境';
-  bar.className = 'bar' + (mode === 'live' && age > 15 ? ' old' : '');
+  document.getElementById('st').textContent = mode === 'live' ? '快照 ' + hm(src.updated) + '（' + age + ' 分鐘前）' + (src.status && src.status.fails ? '　抓取失敗 ' + src.status.fails + ' 次：' + src.status.failReason : '') : '示範情境';
+  bar.classList.toggle('old', mode === 'live' && age > 15);
 }
 
 async function load() {
   if (API.indexOf('http') !== 0) { render(); return; }
   try {
-    const res = await fetch(API);
+    const res = await fetch(API + '?history=24');
     snap = await res.json();
     document.getElementById('msg').style.display = 'none';
   } catch (e) {
@@ -323,6 +469,7 @@ let last = performance.now();
   requestAnimationFrame(loop);
 })(last);
 
+document.getElementById('rf').onclick = load;
 load(); setInterval(load, 60000);
 </script>
 </body>
