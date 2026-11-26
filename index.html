@@ -109,7 +109,7 @@ footer{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
 <section class="band"><div class="wrap"><div class="widget" id="sum"></div></div></section>
 <footer><p>場景朝南看：左側是東、右側是西。順逆風與側風以 METAR 風向（真北）對照跑道真方位計算，只是參考，不等於各機型的作業限制；側風 20 kt 以上會標示注意。跑道取自公開資料：松山 10/28、桃園 05/23、虹橋 18/36、浦東 16/17 與 34/35。METAR 沒有颱風欄位，強風與暴風標籤只依風速判斷。</p></footer>
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbw2nt_3kBe7CtRSq7YItqpalquu2rsvqP8f5TR6jUjSiu9IKvp7d3gzSIqncKZ6uKGL/exec';
+const API = '貼上你的 GAS /exec 網址';
 const META = {
   TSA: ['RCSS', '松山', 25.0697, 121.5522],
   TPE: ['RCTP', '桃園', 25.0777, 121.2328],
@@ -562,7 +562,7 @@ sel.innerHTML = '<option value="live">即時資料</option>' + Object.keys(PRE).
 sel.onchange = () => { mode = sel.value; render(); };
 
 // ---------- 動畫與省電 ----------
-// 自動：沒下雨 12 fps、下雨或雷暴 24 fps；3 分鐘沒操作降到 6 fps，20 分鐘沒操作停止動畫。
+// 自動：沒下雨 10 fps、下雨或雷暴 20 fps；3 分鐘沒操作降到 5 fps，20 分鐘沒操作停止動畫。
 // 省電：只畫靜態畫面。完整：固定 30 fps。系統設定「減少動態效果」、資料節省、電量 20% 以下（不在充電）時，自動模式會改成省電。
 let pref = 'auto', autoEco = false, lowBat = false, lastAct = Date.now(), running = false, need = true, loopT = null, last = 0;
 try { pref = localStorage.getItem('pm') || 'auto'; } catch (e) { /* 無痕模式等情況讀不到就用預設 */ }
@@ -582,17 +582,19 @@ function targetFps() {
   if (m === 'full') return 30;
   const idle = idleMs();
   if (idle > 20 * 60e3) return 0;
-  return Math.min(wet() ? 24 : 12, idle > 3 * 60e3 ? 6 : 99);
+  return Math.min(wet() ? 20 : 10, idle > 3 * 60e3 ? 5 : 99);
 }
 function frame() {
   loopT = null;
-  const fps = targetFps();
-  if (document.hidden || !anyVis() || (!fps && !need)) { running = false; return; }   // 背景、畫面外、靜態：不排任何計時器
+  if (document.hidden || !anyVis() || (!targetFps() && !need)) { running = false; return; }   // 背景、畫面外、靜態：不排任何計時器
   requestAnimationFrame(now => {
-    const dt = fps ? Math.min(.25, (now - last) / 1000) : 0; last = now;
+    if (document.hidden) { running = false; return; }
+    const f = targetFps();                                 // 在畫之前重新判斷，避免剛好被點擊或切換模式時漏接
+    const dt = f ? Math.min(.25, (now - last) / 1000) : 0; last = now;
     for (const k in cards) if (cards[k].s && cards[k].W && cards[k].vis !== false) draw(cards[k], now / 1000, dt);
     need = false;
-    if (fps) loopT = setTimeout(frame, 1000 / fps); else running = false;
+    const f2 = targetFps();
+    if (f2) loopT = setTimeout(frame, Math.max(0, 1000 / f2 - (performance.now() - now) - 8)); else running = false;   // 扣掉已用時間與等下一次垂直同步的時間
   });
 }
 function kick() { if (running || document.hidden) return; running = true; last = performance.now(); frame(); }
